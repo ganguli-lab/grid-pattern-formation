@@ -67,7 +67,7 @@ class Trainer(object):
                 self.model.hd_outputs    : hd_outputs_batch, 
                 self.model.place_init    : place_init_batch,
                 self.model.hd_init       : hd_init_batch,
-                self.model.keep_prob     : 0.5
+                self.model.keep_prob     : 0.2
             })
         
         if step % 10 == 0:
@@ -84,7 +84,7 @@ class Trainer(object):
                                             self.model.hd_outputs    : hd_outputs_batch, 
                                             self.model.place_init    : place_init_batch,
                                             self.model.hd_init       : hd_init_batch,
-                                            self.model.keep_prob     : 0.5
+                                            self.model.keep_prob     : 0.2
                                         })
 
             test_summary_writer.add_summary(test_summary_str, step)

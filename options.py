@@ -8,7 +8,7 @@ import tensorflow as tf
 def get_options():
     tf.app.flags.DEFINE_string('f', '', 'kernel')
     tf.app.flags.DEFINE_string("save_dir", "saved", "checkpoints,log,options save directory")
-    tf.app.flags.DEFINE_string("run_ID", "seq_2000", "save_ID")
+    tf.app.flags.DEFINE_string("run_ID", "seq_2000_dropout_02", "save_ID")
     tf.app.flags.DEFINE_integer("batch_size", 50, "batch size") # 10
     tf.app.flags.DEFINE_integer("sequence_length", 2000, "sequence length")    
     tf.app.flags.DEFINE_integer("steps", 300000, "training steps") #300000
