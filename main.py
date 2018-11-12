@@ -70,7 +70,8 @@ def main(argv):
 
     model = Model(place_cell_size=place_cells.cell_size,
                   hd_cell_size=hd_cells.cell_size,
-                  sequence_length=flags.sequence_length)
+                  sequence_length=flags.sequence_length,
+                  gpu=argv[1])
     
     trainer = Trainer(data_manager, model, flags)
 

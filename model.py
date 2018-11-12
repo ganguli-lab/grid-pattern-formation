@@ -8,7 +8,9 @@ import tensorflow as tf
 
 
 class Model(object):
-    def __init__(self, place_cell_size, hd_cell_size, sequence_length):
+    def __init__(self, place_cell_size, hd_cell_size, sequence_length, gpu):
+      gpu = '/device:GPU:' + str(gpu)
+      with tf.device(gpu):
         with tf.variable_scope("model"):
             # Inputs
             self.inputs = tf.placeholder(shape=[None, sequence_length, 3],
