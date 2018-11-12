@@ -9,6 +9,7 @@ import h5py
 # データ内の1エピソードのサイズ
 EPISODE_LENGTH = 10000
 
+
 class DataManager(object):
     POS_RANGE_MAX = 1.1
     POS_RANGE_MIN = -1.1
