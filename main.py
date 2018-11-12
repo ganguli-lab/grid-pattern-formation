@@ -75,7 +75,7 @@ def main(argv):
     
     trainer = Trainer(data_manager, model, flags)
 
-    sess = tf.Session()
+    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
 
