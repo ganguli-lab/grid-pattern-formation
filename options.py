@@ -13,9 +13,12 @@ def get_options():
     tf.app.flags.DEFINE_integer("sequence_length", 2000, "sequence length")    
     tf.app.flags.DEFINE_integer("steps", 300000, "training steps") #300000
     tf.app.flags.DEFINE_integer("save_interval", 500, "saving interval")
-    tf.app.flags.DEFINE_float("learning_rate", 1e-2, "learning rate")
+    tf.app.flags.DEFINE_float("learning_rate", 1e-3, "learning rate")
     tf.app.flags.DEFINE_float("momentum", 0.9, "momentum")
     tf.app.flags.DEFINE_float("l2_reg", 1e-5, "weight decay") #1e-5
     tf.app.flags.DEFINE_float("gradient_clipping", 1e-5, "gradient clipping")
+    tf.app.flags.DEFINE_float("num_place_cells", 256, "number place cells")
+    tf.app.flags.DEFINE_float("place_cell_rf", 0.01, "place cell receptive field")
+    tf.app.flags.DEFINE_float("num_hd_cells", 12, "number hd cells")
     return tf.app.flags.FLAGS
 

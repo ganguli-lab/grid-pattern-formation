@@ -13,21 +13,9 @@ import matplotlib.pylab as plt
 
 import os
 from scipy.misc import imsave
+from scipy.signal import correlate2d
 import cv2
 
-# from model import Model
-# from data_manager import DataManager
-# from hd_cells import HDCells
-# from place_cells import PlaceCells
-
-# def load_checkpoints(sess):
-#     saver = tf.train.Saver(max_to_keep=2)
-#     save_dir = "./saved"
-#     checkpoint_dir = save_dir + "/checkpoints_viz_center_batch_50"
-    
-#     checkpoint = tf.train.get_checkpoint_state(checkpoint_dir)
-#     if checkpoint and checkpoint.model_checkpoint_path:
-#         saver.restore(sess, checkpoint.model_checkpoint_path)
 
 def concat_images(images, image_width, spacer_size):
     """ Concat image horizontally with spacer """
@@ -68,24 +56,6 @@ def convert_to_colomap(im, cmap):
     im = np.uint8(im * 255)
     return im
 
-# np.random.seed(1)
-    
-# data_manager = DataManager()
-
-# place_cells = PlaceCells()
-# hd_cells = HDCells()
-
-# data_manager.prepare(place_cells, hd_cells)
-
-# model = Model(place_cell_size=place_cells.cell_size,
-#                           hd_cell_size=hd_cells.cell_size,
-#                           sequence_length=100)
-
-# sess = tf.Session()
-# sess.run(tf.global_variables_initializer())
-
-# # Load checkpoints
-# load_checkpoints(sess)
 
 def save_visualization(sess, data_manager, model, save_name, step, flags):
     batch_size = flags.batch_size
@@ -144,9 +114,13 @@ def save_visualization(sess, data_manager, model, save_name, step, flags):
                         dsize=(resolution*2, resolution*2),
                         interpolation=cv2.INTER_NEAREST)
         # (40, 40, 4), uint8
-        images.append(im)
 
-    concated_image = concat_images_in_rows(images, 32, resolution*2)
+        acorr = correlate2d(im, im, boundary='wrap')    
+
+        images.append(im)
+        images.append(acorr)
+
+    concated_image = concat_images_in_rows(images, 64, resolution*2)
     imdir = "images/" + save_name
     if not os.path.exists(imdir):
         os.mkdir(imdir)

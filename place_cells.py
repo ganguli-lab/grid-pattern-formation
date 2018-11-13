@@ -7,9 +7,8 @@ import numpy as np
 
 
 class PlaceCells(object):
-    def __init__(self, cell_size=256, pos_range_min=-1.1, pos_range_max=1.1):
+    def __init__(self, cell_size=256, std=0.01, pos_range_min=-1.1, pos_range_max=1.1):
         self.cell_size = cell_size
-        std = 0.01
         self.sigma_sq = std * std
         # Means of the gaussian
         self.us = np.random.rand(cell_size, 2) * (pos_range_max - pos_range_min) + pos_range_min

@@ -63,15 +63,14 @@ def main(argv):
 
     data_manager = DataManager()
 
-    place_cells = PlaceCells()
-    hd_cells = HDCells()
+    place_cells = PlaceCells(cell_size=flags.num_place_cells, std=flags.place_cell_rf)
+    hd_cells = HDCells(cell_size=flags.num_hd_cells)
 
     data_manager.prepare(place_cells, hd_cells)
 
     model = Model(place_cell_size=place_cells.cell_size,
                   hd_cell_size=hd_cells.cell_size,
-                  sequence_length=flags.sequence_length,
-                  gpu=argv[1])
+                  sequence_length=flags.sequence_length)
     
     trainer = Trainer(data_manager, model, flags)
 
