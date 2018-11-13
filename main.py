@@ -63,8 +63,8 @@ def main(argv):
 
     data_manager = DataManager()
 
-    place_cells = PlaceCells(cell_size=flags.num_place_cells, std=flags.place_cell_rf)
-    hd_cells = HDCells(cell_size=flags.num_hd_cells)
+    place_cells = PlaceCells(cell_size=int(flags.num_place_cells), std=float(flags.place_cell_rf))
+    hd_cells = HDCells(cell_size=int(flags.num_hd_cells))
 
     data_manager.prepare(place_cells, hd_cells)
 

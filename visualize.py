@@ -115,12 +115,9 @@ def save_visualization(sess, data_manager, model, save_name, step, flags):
                         interpolation=cv2.INTER_NEAREST)
         # (40, 40, 4), uint8
 
-        acorr = correlate2d(im, im, boundary='wrap')    
-
         images.append(im)
-        images.append(acorr)
 
-    concated_image = concat_images_in_rows(images, 64, resolution*2)
+    concated_image = concat_images_in_rows(images, 32, resolution*2)
     imdir = "images/" + save_name
     if not os.path.exists(imdir):
         os.mkdir(imdir)
