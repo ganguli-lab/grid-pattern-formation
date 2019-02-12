@@ -7,7 +7,7 @@ class DataManager(object):
     def __init__(self, flags):
         self.flags = flags
         root = '/home/ec2-user/grid_cells'
-        basepath = 'ben_decimate_1000_step'
+        basepath = flags.dataset
         base = os.path.join(root, basepath)
         
         self.filenames = []
@@ -16,9 +16,8 @@ class DataManager(object):
             if file.endswith('tfrecord'):
                 self.filenames.append(os.path.join(root, basepath, file))
                 self.num_files += 1
-        self.num_files = 1
         self.num_traj_per_file = 100
-        self.saved_traj_len = 1000
+        self.saved_traj_len = 100
 
         
     def parser(self, record):
@@ -66,12 +65,12 @@ class DataManager(object):
             example['init_x'],
             example['init_y'],
             example['init_hd'],
-            example['ego_v'],
-            example['theta_x'],
-            example['theta_y'],
-            example['target_x'],
-            example['target_y'],
-            example['target_hd']
+            example['ego_v'][:self.flags.sequence_length],
+            example['theta_x'][:self.flags.sequence_length],
+            example['theta_y'][:self.flags.sequence_length],
+            example['target_x'][:self.flags.sequence_length],
+            example['target_y'][:self.flags.sequence_length],
+            example['target_hd'][:self.flags.sequence_length]
         ]
         return batch
 

@@ -53,6 +53,10 @@ def train(sess, model, trainer, saver, summary_writer, test_summary_writer, star
             save_checkponts(sess, saver, i)
             save_name = flags.run_ID
             visualize.save_visualization(sess, model, save_name, step=i, flags=flags)
+            
+        if i % (20*flags.save_interval) == 0:
+            save_name = flags.run_ID
+            visualize.save_autocorr(sess, model, save_name, step=i, flags=flags)
 
 
 def main(argv):

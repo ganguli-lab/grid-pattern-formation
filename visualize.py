@@ -16,6 +16,9 @@ from scipy.misc import imsave
 from scipy.signal import correlate2d
 import cv2
 
+import scores
+import utils
+
 
 def concat_images(images, image_width, spacer_size):
     """ Concat image horizontally with spacer """
@@ -69,11 +72,8 @@ def save_visualization(sess, model, save_name, step, flags):
     index_size = 100
 
     for index in range(index_size):
-
+        g, place_pos_batch = sess.run([model.g, model.target_pos])
         place_pos_batch = np.reshape(place_pos_batch, [-1, 2])
-        # (1000, 2)
-
-        g, place_pos_batch = sess.run(model.g, model.target_pos)
 
         for i in range(batch_size * sequence_length):
             pos_x = place_pos_batch[i,0]
@@ -82,7 +82,7 @@ def save_visualization(sess, model, save_name, step, flags):
             z = (pos_z + maze_extents) / (maze_extents * 2) * resolution
             if x >=0 and x < resolution and z >=0 and z < resolution:
                 counts[int(x), int(z)] += 1
-                activations[:, int(x), int(z)] += np.abs(g[i, :])
+                activations[:, int(x), int(z)] += g[i, :]
 
     for x in range(resolution):
         for y in range(resolution):
@@ -116,4 +116,23 @@ def save_visualization(sess, model, save_name, step, flags):
 
 
 
-
+def save_autocorr(sess, model, save_name, step, flags):
+    starts = [0.2] * 10
+    ends = np.linspace(0.4, 1.0, num=10)
+    coord_range=((-1.1, 1.1), (-1.1, 1.1))
+    masks_parameters = zip(starts, ends.tolist())
+    latest_epoch_scorer = scores.GridScorer(20, coord_range, masks_parameters)
+    
+    res = dict()
+    index_size = 100
+    for _ in range(index_size):
+      mb_res = sess.run({
+          'pos_xy': model.target_pos,
+          'bottleneck': model.g,
+      })
+      res = utils.concat_dict(res, mb_res)
+        
+    filename = save_name + '/autocorrs_' + str(step) + '.pdf'
+    out = utils.get_scores_and_plot(
+                latest_epoch_scorer, res['pos_xy'], res['bottleneck'],
+                'images/', filename)

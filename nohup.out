@@ -31,3 +31,9 @@ into the labels input on backprop by default.
 
 See `tf.nn.softmax_cross_entropy_with_logits_v2`.
 
+WARNING:tensorflow:From /home/ec2-user/grid_cells/ensembles.py:122: calling reduce_logsumexp (from tensorflow.python.ops.math_ops) with keep_dims is deprecated and will be removed in a future version.
+Instructions for updating:
+keep_dims is deprecated, use keepdims instead
+WARNING:tensorflow:From /home/ec2-user/grid_cells/ensembles.py:39: calling softmax (from tensorflow.python.ops.nn_ops) with dim is deprecated and will be removed in a future version.
+Instructions for updating:
+dim is deprecated, use axis instead

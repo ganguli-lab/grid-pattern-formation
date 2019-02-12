@@ -21,9 +21,9 @@ class Trainer(object):
             l2_reg_loss = tf.add_n([ tf.nn.l2_loss(v) for v in output_vars
                                      if 'bias' not in v.name ]) * flags.l2_reg
         
-            optimizer = tf.train.AdamOptimizer(
+            optimizer = tf.train.RMSPropOptimizer(
                 learning_rate=flags.learning_rate,
-#                 momentum=flags.momentum
+                momentum=flags.momentum
             )
             
             total_loss = self.model.place_loss + \

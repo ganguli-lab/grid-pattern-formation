@@ -55,7 +55,7 @@ class Model(object):
           # Drop out probability
           self.keep_prob = tf.constant(0.5, dtype=tf.float32)
           
-          self.cell = tf.nn.rnn_cell.BasicLSTMCell(128,
+          self.cell = tf.nn.rnn_cell.LSTMCell(128,
                                               state_is_tuple=True)
 
           # init cell
@@ -90,10 +90,10 @@ class Model(object):
                                                shape=[-1, flags.num_hd_cells])
 
               self.place_loss = tf.reduce_mean(
-                  tf.nn.softmax_cross_entropy_with_logits(labels=place_outputs_reshaped,
+                  tf.nn.softmax_cross_entropy_with_logits_v2(labels=place_outputs_reshaped,
                                                           logits=place_logits))
               self.hd_loss = tf.reduce_mean(
-                  tf.nn.softmax_cross_entropy_with_logits(labels=hd_outputs_reshaped,
+                  tf.nn.softmax_cross_entropy_with_logits_v2(labels=hd_outputs_reshaped,
                                                           logits=hd_logits))
               
               self.hd_outputs_result = tf.nn.softmax(hd_logits)
