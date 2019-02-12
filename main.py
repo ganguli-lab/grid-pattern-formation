@@ -43,7 +43,7 @@ def save_checkponts(sess, saver, global_step):
     print("Checkpoint saved")
 
 
-def train(sess, data_manager, model, trainer, saver, summary_writer, test_summary_writer, start_step):
+def train(sess, model, trainer, saver, summary_writer, test_summary_writer, start_step):
     for i in range(start_step, flags.steps):
         # 学習
         trainer.train(sess, summary_writer, test_summary_writer, step=i, flags=flags)
@@ -52,7 +52,7 @@ def train(sess, data_manager, model, trainer, saver, summary_writer, test_summar
             # 保存
             save_checkponts(sess, saver, i)
             save_name = flags.run_ID
-            visualize.save_visualization(sess, data_manager, model, save_name, step=i, flags=flags)
+            visualize.save_visualization(sess, model, save_name, step=i, flags=flags)
 
 
 def main(argv):
@@ -61,20 +61,11 @@ def main(argv):
     if not os.path.exists(flags.save_dir):
         os.mkdir(flags.save_dir)
 
-    data_manager = DataManager()
-
-    place_cells = PlaceCells(cell_size=int(flags.num_place_cells), std=float(flags.place_cell_rf))
-    hd_cells = HDCells(cell_size=int(flags.num_hd_cells))
-
-    data_manager.prepare(place_cells, hd_cells)
-
-    model = Model(place_cell_size=place_cells.cell_size,
-                  hd_cell_size=hd_cells.cell_size,
-                  sequence_length=flags.sequence_length)
+    model = Model(flags)
     
-    trainer = Trainer(data_manager, model, flags)
+    trainer = Trainer(model, flags)
 
-    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+    sess = tf.Session()
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
 
@@ -88,7 +79,7 @@ def main(argv):
     saver, start_step = load_checkpoints(sess)
 
     # Train
-    train(sess, data_manager, model, trainer, saver, summary_writer, test_summary_writer, start_step)
+    train(sess, model, trainer, saver, summary_writer, test_summary_writer, start_step)
 
     
 

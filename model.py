@@ -6,60 +6,88 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
+from data_manager import DataManager
+import utils
+
 
 class Model(object):
-    def __init__(self, place_cell_size, hd_cell_size, sequence_length):
+    def __init__(self, flags):
       with tf.variable_scope("model"):
-          # Inputs
-          self.inputs = tf.placeholder(shape=[None, sequence_length, 3],
-                                       dtype=tf.float32)
-          # Outputs
-          self.place_outputs = tf.placeholder(shape=[None, sequence_length, place_cell_size],
-                                              dtype=tf.float32)
-          self.hd_outputs = tf.placeholder(shape=[None, sequence_length, hd_cell_size],
-                                           dtype=tf.float32)
+        
+          data_manager = DataManager(flags)
+          batch = data_manager.get_batch()
+          init_x, init_y, init_hd, ego_v, theta_x,  \
+            theta_y, target_x, target_y, target_hd = batch
+            
+          self.inputs = tf.stack([ego_v, theta_x, theta_y], axis=-1)
+          init_pos = tf.concat([init_x, init_y], axis=-1)
+          self.target_pos = tf.stack([target_x, target_y], axis=-1)
+          self.target_hd = tf.expand_dims(target_hd, axis=-1)
+            
+          print('INIT POS SHAPE = ' + str(init_pos))
           
-          # Initial place and hd cells input
-          self.place_init = tf.placeholder(shape=[None, place_cell_size],
-                                           dtype=tf.float32)
-          self.hd_init = tf.placeholder(shape=[None, hd_cell_size],
-                                        dtype=tf.float32)
+            
+          place_cell_ensembles = utils.get_place_cell_ensembles(
+              env_size=2.2,
+              neurons_seed=8341,
+              targets_type='softmax',
+              lstm_init_type='softmax',
+              n_pc=[flags.num_place_cells],
+              pc_scale=[flags.place_cell_rf])
+
+          head_direction_ensembles = utils.get_head_direction_ensembles(
+              neurons_seed=8341,
+              targets_type='softmax',
+              lstm_init_type='softmax',
+              n_hdc=[flags.num_hd_cells],
+              hdc_concentration=[flags.hd_cell_rf])
+            
+          initial_conds = utils.encode_initial_conditions(
+              init_pos, init_hd, place_cell_ensembles, head_direction_ensembles)
+          self.place_init, self.hd_init = initial_conds
+
+
+          ensembles_targets = utils.encode_targets(
+              self.target_pos, self.target_hd, place_cell_ensembles, head_direction_ensembles)
+          self.place_outputs, self.hd_outputs = ensembles_targets
+            
+
           # Drop out probability
-          self.keep_prob = tf.placeholder(shape=[], dtype=tf.float32)
+          self.keep_prob = tf.constant(0.5, dtype=tf.float32)
           
-          cell = tf.nn.rnn_cell.BasicLSTMCell(128,
+          self.cell = tf.nn.rnn_cell.BasicLSTMCell(128,
                                               state_is_tuple=True)
 
           # init cell
-          l0 = tf.layers.dense(self.place_init, 128, use_bias=False) + \
+          self.l0 = tf.layers.dense(self.place_init, 128, use_bias=False) + \
                tf.layers.dense(self.hd_init, 128, use_bias=False)    #turn off biases?
           # init hidden
-          m0 = tf.layers.dense(self.place_init, 128, use_bias=False) + \
+          self.m0 = tf.layers.dense(self.place_init, 128, use_bias=False) + \
                tf.layers.dense(self.hd_init, 128, use_bias=False)   #turn off biases?
           
-          initial_state = tf.nn.rnn_cell.LSTMStateTuple(l0, m0)
+          self.initial_state = tf.nn.rnn_cell.LSTMStateTuple(self.l0, self.m0)
           
-          rnn_output, rnn_state = tf.nn.dynamic_rnn(cell=cell,
+          self.rnn_output, self.rnn_state = tf.nn.dynamic_rnn(cell=self.cell,
                                                     inputs=self.inputs,
-                                                    initial_state=initial_state,
+                                                    initial_state=self.initial_state,
                                                     dtype=tf.float32,
                                                     time_major=False)
           
           # rnn_output=(-1,sequence_length,128), rnn_state=((-1,128), (-1,128))
-          rnn_output = tf.reshape(rnn_output, shape=[-1, 128])
+          rnn_output = tf.reshape(self.rnn_output, shape=[-1, 128])
 
           self.g = tf.layers.dense(rnn_output, 512, use_bias=True) 
 
           g_dropout = tf.nn.dropout(self.g, self.keep_prob)
           
           with tf.variable_scope("outputs"):
-              place_logits = tf.layers.dense(g_dropout, place_cell_size, use_bias=True)
-              hd_logits    = tf.layers.dense(g_dropout, hd_cell_size, use_bias=True)
+              place_logits = tf.layers.dense(g_dropout, flags.num_place_cells, use_bias=True)
+              hd_logits    = tf.layers.dense(g_dropout, flags.num_hd_cells, use_bias=True)
               
               place_outputs_reshaped = tf.reshape(self.place_outputs,
-                                                  shape=[-1, place_cell_size])
+                                                  shape=[-1, flags.num_place_cells])
               hd_outputs_reshaped = tf.reshape(self.hd_outputs,
-                                               shape=[-1, hd_cell_size])
+                                               shape=[-1, flags.num_hd_cells])
 
               self.place_loss = tf.reduce_mean(
                   tf.nn.softmax_cross_entropy_with_logits(labels=place_outputs_reshaped,

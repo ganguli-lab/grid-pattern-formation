@@ -57,7 +57,7 @@ def convert_to_colomap(im, cmap):
     return im
 
 
-def save_visualization(sess, data_manager, model, save_name, step, flags):
+def save_visualization(sess, model, save_name, step, flags):
     batch_size = flags.batch_size
     sequence_length = flags.sequence_length
     resolution = 20
@@ -66,23 +66,14 @@ def save_visualization(sess, data_manager, model, save_name, step, flags):
     activations = np.zeros([512, resolution, resolution], dtype=np.float32) # (512, 32, 32)
     counts  = np.zeros([resolution, resolution], dtype=np.int32)        # (32, 32)
 
-    index_size = data_manager.get_confirm_index_size(batch_size, sequence_length)
+    index_size = 100
 
     for index in range(index_size):
-        out = data_manager.get_confirm_batch(batch_size, sequence_length, index)
-        inputs_batch, place_init_batch, hd_init_batch, \
-            place_pos_batch, head_dir_batch, place_cells_batch, hd_cells_batch = out
 
         place_pos_batch = np.reshape(place_pos_batch, [-1, 2])
         # (1000, 2)
 
-        g = sess.run(
-                model.g,
-                feed_dict = {
-                    model.inputs : inputs_batch,
-                    model.place_init : place_init_batch,
-                    model.hd_init : hd_init_batch,
-                })
+        g, place_pos_batch = sess.run(model.g, model.target_pos)
 
         for i in range(batch_size * sequence_length):
             pos_x = place_pos_batch[i,0]

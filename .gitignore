@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+ben_decimate_1000_step/
+
 # C extensions
 *.so
 

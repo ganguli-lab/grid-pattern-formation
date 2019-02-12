@@ -8,8 +8,7 @@ import numpy as np
 
 
 class Trainer(object):
-    def __init__(self, data_manager, model, flags):
-        self.data_manager = data_manager
+    def __init__(self, model, flags):
         self.model = model
         
         self._prepare_optimizer(flags)
@@ -55,36 +54,12 @@ class Trainer(object):
         self.summary_op = tf.summary.merge_all()
 
     def train(self, sess, summary_writer, test_summary_writer, step, flags):
-        out = self.data_manager.get_train_batch(flags.batch_size,
-                                                flags.sequence_length)
-        inputs_batch, place_outputs_batch, hd_outputs_batch, place_init_batch, hd_init_batch = \
-            out
-        _, summary_str = sess.run(
-            [self.train_op, self.summary_op],
-            feed_dict = {
-                self.model.inputs        : inputs_batch,
-                self.model.place_outputs : place_outputs_batch, 
-                self.model.hd_outputs    : hd_outputs_batch, 
-                self.model.place_init    : place_init_batch,
-                self.model.hd_init       : hd_init_batch,
-                self.model.keep_prob     : 0.5
-            })
+        
+        _, summary_str = sess.run([self.train_op, self.summary_op])
         
         if step % 10 == 0:
             summary_writer.add_summary(summary_str, step)
 
-            out = self.data_manager.get_test_batch(flags.batch_size,
-                                                flags.sequence_length)
-            inputs_batch, place_outputs_batch, hd_outputs_batch, place_init_batch, hd_init_batch = \
-                out
-            test_summary_str = sess.run(self.summary_op,
-                                        feed_dict = {
-                                            self.model.inputs        : inputs_batch,
-                                            self.model.place_outputs : place_outputs_batch, 
-                                            self.model.hd_outputs    : hd_outputs_batch, 
-                                            self.model.place_init    : place_init_batch,
-                                            self.model.hd_init       : hd_init_batch,
-                                            self.model.keep_prob     : 0.5
-                                        })
+            test_summary_str = sess.run(self.summary_op)
 
             test_summary_writer.add_summary(test_summary_str, step)

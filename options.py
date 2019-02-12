@@ -17,8 +17,9 @@ def get_options():
     tf.app.flags.DEFINE_float("momentum", 0.9, "momentum")
     tf.app.flags.DEFINE_float("l2_reg", 1e-5, "weight decay") #1e-5
     tf.app.flags.DEFINE_float("gradient_clipping", 1e-5, "gradient clipping")
-    tf.app.flags.DEFINE_float("num_place_cells", 256, "number place cells")
+    tf.app.flags.DEFINE_integer("num_place_cells", 256, "number place cells")
     tf.app.flags.DEFINE_float("place_cell_rf", 0.01, "place cell receptive field")
-    tf.app.flags.DEFINE_float("num_hd_cells", 12, "number hd cells")
+    tf.app.flags.DEFINE_integer("num_hd_cells", 12, "number hd cells")
+    tf.app.flags.DEFINE_float("hd_cell_rf", 20., "hd cell receptive field")
     return tf.app.flags.FLAGS
 
