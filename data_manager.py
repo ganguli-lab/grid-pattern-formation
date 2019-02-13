@@ -17,7 +17,6 @@ class DataManager(object):
                 self.filenames.append(os.path.join(root, basepath, file))
                 self.num_files += 1
         self.num_traj_per_file = 100
-        self.saved_traj_len = 100
 
         
     def parser(self, record):
@@ -37,27 +36,27 @@ class DataManager(object):
                     dtype=tf.float32),
             'ego_v':
                 tf.FixedLenFeature(
-                    shape=[self.saved_traj_len],
+                    shape=[self.flags.sequence_length],
                     dtype=tf.float32),
             'theta_x':
                 tf.FixedLenFeature(
-                    shape=[self.saved_traj_len],
+                    shape=[self.flags.sequence_length],
                     dtype=tf.float32),
             'theta_y':
                 tf.FixedLenFeature(
-                    shape=[self.saved_traj_len],
+                    shape=[self.flags.sequence_length],
                     dtype=tf.float32),
             'target_x':
                 tf.FixedLenFeature(
-                    shape=[self.saved_traj_len],
+                    shape=[self.flags.sequence_length],
                     dtype=tf.float32),
             'target_y':
                 tf.FixedLenFeature(
-                    shape=[self.saved_traj_len],
+                    shape=[self.flags.sequence_length],
                     dtype=tf.float32),
             'target_hd':
                 tf.FixedLenFeature(
-                    shape=[self.saved_traj_len],
+                    shape=[self.flags.sequence_length],
                     dtype=tf.float32),
         }
         example = tf.parse_single_example(record, feature_map)
@@ -65,12 +64,12 @@ class DataManager(object):
             example['init_x'],
             example['init_y'],
             example['init_hd'],
-            example['ego_v'][:self.flags.sequence_length],
-            example['theta_x'][:self.flags.sequence_length],
-            example['theta_y'][:self.flags.sequence_length],
-            example['target_x'][:self.flags.sequence_length],
-            example['target_y'][:self.flags.sequence_length],
-            example['target_hd'][:self.flags.sequence_length]
+            example['ego_v'],
+            example['theta_x'],
+            example['theta_y'],
+            example['target_x'],
+            example['target_y'],
+            example['target_hd']
         ]
         return batch
 
