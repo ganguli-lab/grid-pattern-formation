@@ -54,9 +54,9 @@ def train(sess, model, trainer, saver, summary_writer, test_summary_writer, star
             save_name = flags.run_ID
             visualize.save_visualization(sess, model, save_name, step=i, flags=flags)
             
-        if i % (20*flags.save_interval) == 0:
+        if (i+1) % (10*flags.save_interval) == 0:
             save_name = flags.run_ID
-            visualize.save_autocorr(sess, model, save_name, step=i, flags=flags)
+            visualize.save_autocorr(sess, model, save_name, step=(i+1), flags=flags)
 
 
 def main(argv):

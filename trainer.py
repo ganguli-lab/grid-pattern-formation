@@ -20,15 +20,26 @@ class Trainer(object):
             # Apply L2 regularization to output linear layers
             l2_reg_loss = tf.add_n([ tf.nn.l2_loss(v) for v in output_vars
                                      if 'bias' not in v.name ]) * flags.l2_reg
+            
+            
+            # Add grid-to-place weight histogram:
+            for v in output_vars:
+                if 'bias' not in v.name:
+                    tf.summary.histogram(v.name, v)
+            
+# #             Apply sparsity constraint on RNN
+#             v = tf.trainable_variables('model/rnn/lstm_cell/kernel')
+#             sparsity_loss = tf.reduce_sum(tf.abs(v)) * flags.l2_reg * 100
+#             tf.summary.histogram('recurrent weights', v)
         
-            optimizer = tf.train.RMSPropOptimizer(
+            optimizer = tf.train.AdamOptimizer(
                 learning_rate=flags.learning_rate,
-                momentum=flags.momentum
+#                 momentum = flags.momentum
             )
             
             total_loss = self.model.place_loss + \
                          self.model.hd_loss + \
-                         l2_reg_loss
+                         l2_reg_loss 
 
             # Apply gradient clipping
             gvs = optimizer.compute_gradients(total_loss)

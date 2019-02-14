@@ -10,6 +10,10 @@ from data_manager import DataManager
 import utils
 
 
+# For nonnegative constraint
+from keras.constraints import non_neg
+
+
 class Model(object):
     def __init__(self, flags):
       with tf.variable_scope("model"):
@@ -50,7 +54,7 @@ class Model(object):
             
 
           # Drop out probability
-          self.keep_prob = tf.constant(0.5, dtype=tf.float32)
+          self.keep_prob = tf.constant(flags.keep_prob, dtype=tf.float32)
           
           self.cell = tf.nn.rnn_cell.LSTMCell(128,
                                               state_is_tuple=True)
@@ -73,7 +77,7 @@ class Model(object):
           # rnn_output=(-1,sequence_length,128), rnn_state=((-1,128), (-1,128))
           rnn_output = tf.reshape(self.rnn_output, shape=[-1, 128])
 
-          self.g = tf.layers.dense(rnn_output, 512, use_bias=True) 
+          self.g = tf.layers.dense(rnn_output, 512, use_bias=True)
 
           g_dropout = tf.nn.dropout(self.g, self.keep_prob)
           
