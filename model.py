@@ -24,9 +24,6 @@ class Model(object):
           self.target_pos = tf.stack([target_x, target_y], axis=-1)
           self.target_hd = tf.expand_dims(target_hd, axis=-1)
             
-          print('INIT POS SHAPE = ' + str(init_pos))
-          
-            
           place_cell_ensembles = utils.get_place_cell_ensembles(
               env_size=2.2,
               neurons_seed=8341,

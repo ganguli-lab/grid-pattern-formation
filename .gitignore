@@ -3,7 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+images/
+movies/
+fixed_point_finder_data/
 ben_decimate_1000_step/
+ben_true_100_step/
 
 # C extensions
 *.so
