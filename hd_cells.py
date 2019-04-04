@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import numpy as np
+import tensorflow as tf
 
 
 class HDCells(object):
-    def __init__(self, cell_size=12):
-        self.cell_size = cell_size
+    def __init__(self, n_cells=12):
+        self.n_cells = n_cells
         self.concentration = 20.0
-        self.us = np.random.rand(cell_size) * 2.0 * np.pi - np.pi
-        
+        # self.us = np.random.rand(n_cells) * 2.0 * np.pi - np.pi
+
+        rs = np.random.RandomState(8341)
+        self.us = rs.uniform(-np.pi, np.pi, (n_cells))
+
     def get_activation(self, angle):
         """
-        Arguments:
-          angle: Float (radian)
+        Returns hd cell outputs for an input trajectory
         """
-        d = self.us - angle
-        hs = np.exp(self.concentration * np.cos(d))
-        return hs / np.sum(hs)
+        d = angle[:, :, tf.newaxis] - self.us[np.newaxis, :]
+        unnor_logpdf = self.concentration * tf.cos(d)
+        return tf.nn.softmax(unnor_logpdf)
 
     def get_nearest_hd(self, activation):
         index = np.argmax(activation)

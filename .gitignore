@@ -8,6 +8,8 @@ movies/
 fixed_point_finder_data/
 ben_decimate_1000_step/
 ben_true_100_step/
+ben_100*/
+data/
 
 # C extensions
 *.so
@@ -112,3 +114,5 @@ venv.bak/
 
 # by user
 saved
+*.ipynb
+*.zip

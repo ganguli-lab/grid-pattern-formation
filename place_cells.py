@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import numpy as np
+import tensorflow as tf
 
 
 class PlaceCells(object):
-    def __init__(self, cell_size=256, std=0.01, pos_range_min=-1.1, pos_range_max=1.1):
-        self.cell_size = cell_size
+    def __init__(self, n_cells=256, std=0.01, pos_min=-1.1, pos_max=1.1):
+        self.n_cells = n_cells
         self.sigma_sq = std * std
-        # Means of the gaussian
-        self.us = np.random.rand(cell_size, 2) * (pos_range_max - pos_range_min) + pos_range_min
+
+        # Place cell means
+        # grid_x, grid_y = np.mgrid[pos_min:pos_max:16j, pos_min:pos_max:16j]
+        # self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
+        n_cells = np.int(np.sqrt(n_cells))
+        x, y = np.unravel_index(np.arange(n_cells**2), [n_cells, n_cells])
+        means = np.stack([x, y], axis=1)
+        self.us = means * (pos_max - pos_min) / n_cells + pos_min
 
     def get_activation(self, pos):
         """
-        Arguments:
-          pos: Float Tuple(2)
+        Returns place cell outputs for an input trajectory
         """
-        d = self.us - pos
-        norm2 = np.linalg.norm(d, ord=2, axis=1)
-        c = 1e-5 # for numerical stability
-        cs = np.exp( -(norm2 - np.min(norm2)) / (2.0 * self.sigma_sq) + c)
-        return cs / np.sum(cs)
+        d = pos[:, :, tf.newaxis, :] - self.us[np.newaxis, np.newaxis, ...]
+        norm2 = tf.reduce_sum(d**2, axis=-1)
+        unnor_logpdf = -(norm2) / (2.0 * self.sigma_sq)
+        return tf.nn.softmax(unnor_logpdf)
 
     def get_nearest_cell_pos(self, activation):
         index = np.argmax(activation)

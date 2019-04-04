@@ -26,14 +26,15 @@ def concat_images(images, image_width, spacer_size):
     images_with_spacers = []
 
     image_size = len(images)
-  
+
     for i in range(image_size):
         images_with_spacers.append(images[i])
-        if i != image_size-1:
+        if i != image_size - 1:
             # Add spacer
             images_with_spacers.append(spacer)
     ret = np.hstack(images_with_spacers)
     return ret
+
 
 def concat_images_in_rows(images, row_size, image_width, spacer_size=4):
     """ Concat images in rows """

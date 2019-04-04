@@ -3,13 +3,12 @@ import os
 
 
 class DataManager(object):
-    
     def __init__(self, flags):
         self.flags = flags
-        root = '/home/ec2-user/grid_cells'
+        root = '/Users/bensorscher/mouse/grid_cells'
         basepath = flags.dataset
         base = os.path.join(root, basepath)
-        
+
         self.filenames = []
         self.num_files = 0
         for file in os.listdir(base):
@@ -18,9 +17,10 @@ class DataManager(object):
                 self.num_files += 1
         self.num_traj_per_file = 100
 
-        
     def parser(self, record):
-        """Instantiates the ops used to read and parse the data into tensors."""
+        """
+        Instantiates the ops used to read and parse the data into tensors.
+        """
         feature_map = {
             'init_x':
                 tf.FixedLenFeature(
@@ -72,7 +72,6 @@ class DataManager(object):
             example['target_hd']
         ]
         return batch
-
 
     def get_batch(self):
 
