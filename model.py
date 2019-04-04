@@ -4,7 +4,6 @@ import tensorflow as tf
 from data_manager import DataManager
 from place_cells import PlaceCells
 from hd_cells import HDCells
-import utils
 
 
 class Model(object):
