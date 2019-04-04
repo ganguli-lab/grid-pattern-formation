@@ -13,7 +13,7 @@ import matplotlib.pylab as plt
 
 import os
 from scipy.misc import imsave
-from scipy.signal import correlate2d
+from scipy.signal import correlate2d, gaussian_filter
 import cv2
 
 import scores
@@ -98,7 +98,7 @@ def save_visualization(sess, model, save_name, step, flags):
 
     for i in range(hidden_size):
         im = activations[i,:,:]
-        im = cv2.GaussianBlur(im, (3,3), sigmaX=1, sigmaY=0)
+        im = gaussian_filter(im, (3,3))
         im = (im - np.min(im)) / (np.max(im) - np.min(im))
         im = convert_to_colomap(im, cmap)
 

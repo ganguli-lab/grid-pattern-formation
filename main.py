@@ -55,11 +55,11 @@ def train(
                 sess, model, save_name, step=i, flags=flags
             )
 
-        if (i + 1) % (10 * flags.save_interval) == 0:
-            save_name = flags.run_ID
-            visualize.save_autocorr(
-                sess, model, save_name, step=(i + 1), flags=flags
-            )
+        # if (i + 1) % (10 * flags.save_interval) == 0:
+        #     save_name = flags.run_ID
+        #     visualize.save_autocorr(
+        #         sess, model, save_name, step=(i + 1), flags=flags
+        #     )
 
 
 def main(argv):
