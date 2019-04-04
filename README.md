@@ -1,13 +1,9 @@
-# Vector-based navigation using grid-like representations in artificial agents
+# LSTM trained on a path integration task
 
 ## About
 
-Replicating Google Deep Mind's paper ["Vector-based navigation using grid-like representations in artificial agents."](https://www.nature.com/articles/s41586-018-0102-6)
+Training an LSTM on a path integration task produces grid-like representations
 
 ## Result
 
-![grid visualization](./docs/grid.png)
-
-# References
-
-Simulated rat movement data is taken from Unity Technologies' [rat-rnn experiment repository](https://github.com/Unity-Technologies/rat-rnn).
+![grid visualization](./docs/LSTM_hexagons.png)
