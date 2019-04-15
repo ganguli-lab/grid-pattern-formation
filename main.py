@@ -43,10 +43,10 @@ def save_checkponts(sess, saver, global_step):
 
 
 def train(
-    sess, model, trainer, saver, summary_writer, test_writer, start_step
+    sess, model, trainer, saver, summary_writer, start_step
 ):
     for i in range(start_step, flags.steps):
-        trainer.train(sess, summary_writer, test_writer, step=i, flags=flags)
+        trainer.train(sess, summary_writer, step=i, flags=flags)
 
         if i % flags.save_interval == flags.save_interval - 1:
             save_checkponts(sess, saver, i)
@@ -77,15 +77,13 @@ def main(argv):
 
     # For Tensorboard log
     log_dir = flags.save_dir + "/log/train_" + flags.run_ID
-    test_log_dir = flags.save_dir + "/log/test_" + flags.run_ID
     summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
-    test_writer = tf.summary.FileWriter(test_log_dir, sess.graph)
 
     # Load checkpoints
     saver, start_step = load_checkpoints(sess)
 
     # Train
-    train(sess, model, trainer, saver, summary_writer, test_writer, start_step)
+    train(sess, model, trainer, saver, summary_writer, start_step)
 
 
 if __name__ == '__main__':

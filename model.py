@@ -31,20 +31,6 @@ class Model(object):
 
             place_init = place_cells.get_activation(init_pos)
             self.place_init = tf.squeeze(place_init, axis=1)
-            self.place_outputs = place_cells.get_activation(self.target_pos)
-
-            place_cells = PlaceCells(
-                n_cells=flags.num_place_cells,
-                std=flags.place_cell_rf,
-                pos_min=-flags.env_size,
-                pos_max=flags.env_size
-            )
-            hd_cells = HDCells(
-                n_cells=flags.num_hd_cells
-            )
-
-            place_init = place_cells.get_activation(init_pos)
-            self.place_init = tf.squeeze(place_init, axis=1)
             hd_init = hd_cells.get_activation(init_hd)
             self.hd_init = tf.squeeze(hd_init, axis=1)
             self.place_outputs = place_cells.get_activation(self.target_pos)
@@ -52,21 +38,27 @@ class Model(object):
 
             # Drop out probability
             self.keep_prob = tf.constant(flags.keep_prob, dtype=tf.float32)
-
-            self.cell = tf.nn.rnn_cell.LSTMCell(128, state_is_tuple=True)
+            
+            if flags.RNN_type == 'LSTM':
+                self.cell = tf.nn.rnn_cell.LSTMCell(128, state_is_tuple=True)
+            elif flags.RNN_type == 'RNN':
+                self.cell = tf.nn.rnn_cell.BasicRNNCell(128)
 
             # init cell
             self.l0 = tf.layers.dense(self.place_init, 128, use_bias=False) + \
                 tf.layers.dense(self.hd_init, 128, use_bias=False)
 
-            # init hidden
-            self.m0 = tf.layers.dense(self.place_init, 128, use_bias=False) + \
-                tf.layers.dense(self.hd_init, 128, use_bias=False)
+            if flags.RNN_type == 'LSTM':
+                # init hidden
+                self.m0 = tf.layers.dense(self.place_init, 128, use_bias=False) + \
+                    tf.layers.dense(self.hd_init, 128, use_bias=False)
 
-            self.initial_state = tf.nn.rnn_cell.LSTMStateTuple(
-                self.l0,
-                self.m0
-            )
+                self.initial_state = tf.nn.rnn_cell.LSTMStateTuple(
+                    self.l0,
+                    self.m0
+                )
+            elif flags.RNN_type == 'RNN':
+                self.initial_state = self.l0
 
             self.rnn_output, self.rnn_state = tf.nn.dynamic_rnn(
                 cell=self.cell,

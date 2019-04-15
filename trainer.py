@@ -21,10 +21,19 @@ class Trainer(object):
             optimizer = tf.train.AdamOptimizer(
                 learning_rate=flags.learning_rate,
             )
+            
+            if flags.nonneg_obj == True:
+                nonneg_g = -tf.reduce_sum(tf.minimum(self.model.g, 0)) * 1e-5
+#             g = self.model.g
+#             g = g / tf.reduce_max(g)
+#             nonneg_g = tf.reduce_sum(g**3) * 1e-3
+            else:
+                nonneg_g = 0
+
 
             total_loss = self.model.place_loss + \
                 self.model.hd_loss + \
-                l2_loss
+                l2_loss + nonneg_g
 
             # Apply gradient clipping
             gvs = optimizer.compute_gradients(total_loss)
@@ -48,11 +57,9 @@ class Trainer(object):
             tf.summary.scalar("hd_accuracy", self.model.hd_accuracy)
         self.summary_op = tf.summary.merge_all()
 
-    def train(self, sess, summary_writer, test_summary_writer, step, flags):
+    def train(self, sess, summary_writer, step, flags):
 
         _, summary_str = sess.run([self.train_op, self.summary_op])
 
         if step % 10 == 0:
             summary_writer.add_summary(summary_str, step)
-            test_summary_str = sess.run(self.summary_op)
-            test_summary_writer.add_summary(test_summary_str, step)

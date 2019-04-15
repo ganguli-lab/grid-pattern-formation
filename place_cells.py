@@ -10,12 +10,12 @@ class PlaceCells(object):
         self.sigma_sq = std * std
 
         # Place cell means
-        # grid_x, grid_y = np.mgrid[pos_min:pos_max:16j, pos_min:pos_max:16j]
-        # self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
-        n_cells = np.int(np.sqrt(n_cells))
-        x, y = np.unravel_index(np.arange(n_cells**2), [n_cells, n_cells])
-        means = np.stack([x, y], axis=1)
-        self.us = means * (pos_max - pos_min) / n_cells + pos_min
+        grid_x, grid_y = np.mgrid[pos_min:pos_max:16j, pos_min:pos_max:16j]
+        self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
+#         n_cells = np.int(np.sqrt(n_cells))
+#         x, y = np.unravel_index(np.arange(n_cells**2), [n_cells, n_cells])
+#         means = np.stack([x, y], axis=1)
+#         self.us = means * (pos_max - pos_min) / n_cells + pos_min
 
     def get_activation(self, pos):
         """

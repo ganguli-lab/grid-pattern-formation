@@ -1,11 +1,12 @@
 import tensorflow as tf
 import os
+import numpy as np
 
 
 class DataManager(object):
     def __init__(self, flags):
         self.flags = flags
-        root = '/Users/bensorscher/mouse/grid_cells'
+        root = ''
         basepath = flags.dataset
         base = os.path.join(root, basepath)
 
@@ -74,15 +75,25 @@ class DataManager(object):
         return batch
 
     def get_batch(self):
+        
+        #choose from datasets
+#         datasets = [
+#             tf.data.TFRecordDataset(file).map(self.parser).repeat().batch(self.flags.batch_size)
+#                     for file in self.filenames
+#         ]
+#         choice_idxs = tf.cast(np.repeat(np.arange(10), 1000), tf.int64)
+#         choice_dataset = tf.data.Dataset.from_tensor_slices(choice_idxs).repeat()
+#         dataset = tf.contrib.data.choose_from_datasets(datasets, choice_dataset)
+        
 
-        # Define dataset
+#         # Define dataset
         dataset = tf.data.TFRecordDataset(self.filenames)
         dataset = dataset.map(self.parser)
         num_traj = self.num_files * self.num_traj_per_file
         dataset = dataset.shuffle(buffer_size=num_traj)
-        dataset = dataset.batch(self.flags.batch_size)
         num_epochs = self.flags.steps // self.flags.batch_size
-        dataset = dataset.repeat(num_epochs)
+        dataset = dataset.repeat()
+        dataset = dataset.batch(self.flags.batch_size)
 
         iterator = dataset.make_one_shot_iterator()
 

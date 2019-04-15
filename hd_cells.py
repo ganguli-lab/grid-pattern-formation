@@ -8,10 +8,10 @@ class HDCells(object):
     def __init__(self, n_cells=12):
         self.n_cells = n_cells
         self.concentration = 20.0
-        # self.us = np.random.rand(n_cells) * 2.0 * np.pi - np.pi
+        self.us = np.random.rand(n_cells) * 2.0 * np.pi - np.pi
 
-        rs = np.random.RandomState(8341)
-        self.us = rs.uniform(-np.pi, np.pi, (n_cells))
+#         rs = np.random.RandomState(8341)
+#         self.us = rs.uniform(-np.pi, np.pi, (n_cells))
 
     def get_activation(self, angle):
         """
