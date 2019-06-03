@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import tensorflow as tf
+import numpy as np
 
 
 class Trainer(object):
@@ -22,20 +23,27 @@ class Trainer(object):
                 learning_rate=flags.learning_rate,
             )
             
-            if flags.nonneg_obj == True:
-                nonneg_g = -tf.reduce_sum(tf.minimum(self.model.g, 0)) * 1e-5
+            # Nonnegativity constraint on g (breaking the g -> -g symmetry
+            nonneg_g = -tf.reduce_sum(tf.minimum(self.model.g, 0)) * flags.nonneg_obj
 #             g = self.model.g
 #             g = g / tf.reduce_max(g)
-#             nonneg_g = tf.reduce_sum(g**3) * 1e-3
-            else:
-                nonneg_g = 0
+#             nonneg_g = tf.reduce_sum(g**3) * 1e-5
 
+            # l2 constraint on g
+            l2_g = tf.nn.l2_loss(self.model.g)
+        
+            # l2 constraint on input weights
+            l2_win = tf.nn.l2_loss(tf.trainable_variables('model/dense/kernel'))
+            l2_win += tf.nn.l2_loss(tf.trainable_variables('model/dense_1/kernel'))
+
+            rnn_kernel = tf.trainable_variables('model/rnn/basic_rnn_cell/kernel')
+            sparse_rnn = tf.reduce_sum(tf.abs(rnn_kernel))
 
             total_loss = self.model.place_loss + \
                 self.model.hd_loss + \
                 l2_loss + nonneg_g
-
-            # Apply gradient clipping
+            
+            # Compute gradients
             gvs = optimizer.compute_gradients(total_loss)
 
             clipped_gvs = []
@@ -47,7 +55,15 @@ class Trainer(object):
                 else:
                     gv = (grad, var)
                 clipped_gvs.append(gv)
+                
             self.train_op = optimizer.apply_gradients(clipped_gvs)
+    
+#             # Only train velocity weights
+#             J = tf.trainable_variables('model/rnn/basic_rnn_cell/kernel')
+#             mask = np.zeros([515, 512])
+#             mask[:3] = 1
+#             [(grad, var)] = optimizer.compute_gradients(total_loss, var_list=[J])
+#             self.train_op = optimizer.apply_gradients([(grad*mask, var)])
 
     def _prepare_summary(self):
         with tf.name_scope("logs"):

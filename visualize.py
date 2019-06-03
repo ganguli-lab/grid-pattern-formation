@@ -67,7 +67,7 @@ def save_visualization(sess, model, save_name, step, flags):
     resolution = 20
     maze_extents = 1.1
 
-    activations = np.zeros([512, resolution, resolution], dtype=np.float32) # (512, 32, 32)
+    activations = np.zeros([flags.num_g_cells, resolution, resolution], dtype=np.float32) # (512, 32, 32)
     counts  = np.zeros([resolution, resolution], dtype=np.int32)        # (32, 32)
 
     index_size = 100
@@ -90,7 +90,7 @@ def save_visualization(sess, model, save_name, step, flags):
             if counts[x, y] > 0:
                 activations[:, x, y] /= counts[x, y]
 
-    hidden_size = 512
+    hidden_size = flags.num_g_cells
 
     cmap = matplotlib.cm.get_cmap('jet')
 

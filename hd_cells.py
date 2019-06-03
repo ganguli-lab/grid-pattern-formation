@@ -10,9 +10,6 @@ class HDCells(object):
         self.concentration = 20.0
         self.us = np.random.rand(n_cells) * 2.0 * np.pi - np.pi
 
-#         rs = np.random.RandomState(8341)
-#         self.us = rs.uniform(-np.pi, np.pi, (n_cells))
-
     def get_activation(self, angle):
         """
         Returns hd cell outputs for an input trajectory
