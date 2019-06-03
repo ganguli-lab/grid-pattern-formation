@@ -10,6 +10,7 @@ ben_decimate_1000_step/
 ben_true_100_step/
 ben_100*/
 data/
+nohup.out
 
 # C extensions
 *.so
