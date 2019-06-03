@@ -14,55 +14,31 @@ class Model(object):
             else:
                 data_manager = DataManager(flags)
             batch = data_manager.get_batch()
-            
-            if flags.meta:
-                init_x, init_y, init_hd, ego_v, theta_x,  \
-                    theta_y, target_x, target_y, target_hd, \
-                    self.place_init, self.hd_init, \
-                    place_outputs, hd_outputs = batch
-                self.place_outputs = tf.reshape(place_outputs,
-                                                [flags.batch_size,
-                                                 flags.sequence_length,
-                                                 flags.num_place_cells])
-                self.hd_outputs = tf.reshape(hd_outputs,
-                                             [flags.batch_size,
-                                              flags.sequence_length,
-                                              flags.num_hd_cells])
-                self.target_pos = tf.stack([target_x, target_y], axis=-1)
-                self.target_hd = tf.expand_dims(target_hd, axis=-1)
-            else:
-                init_x, init_y, init_hd, ego_v, theta_x,  \
-                    theta_y, target_x, target_y, target_hd = batch
 
-                init_pos = tf.stack([init_x, init_y], axis=-1)
-                self.target_pos = tf.stack([target_x, target_y], axis=-1)
-                self.target_hd = tf.expand_dims(target_hd, axis=-1)
+            init_x, init_y, init_hd, ego_v, theta_x,  \
+                theta_y, target_x, target_y, target_hd = batch
 
-                place_cells = PlaceCells(
-                    n_cells=flags.num_place_cells,
-                    std=flags.place_cell_rf,
-                    pos_min=-flags.env_size,
-                    pos_max=flags.env_size,
-                    DOG=flags.DOG
-                )
-                hd_cells = HDCells(
-                    n_cells=flags.num_hd_cells
-                )
+            self.inputs = tf.stack([ego_v, theta_x, theta_y], axis=-1)
+            init_pos = tf.stack([init_x, init_y], axis=-1)
+            self.target_pos = tf.stack([target_x, target_y], axis=-1)
+            self.target_hd = tf.expand_dims(target_hd, axis=-1)
 
-                place_init = place_cells.get_activation(init_pos)
-                self.place_init = tf.squeeze(place_init, axis=1)
-                hd_init = hd_cells.get_activation(init_hd)
-                self.hd_init = tf.squeeze(hd_init, axis=1)
-                self.place_outputs = place_cells.get_activation(self.target_pos)
-                self.hd_outputs = hd_cells.get_activation(self.target_hd)
+            place_cells = PlaceCells(
+                n_cells=flags.num_place_cells,
+                std=flags.place_cell_rf,
+                pos_min=-flags.env_size,
+                pos_max=flags.env_size
+            )
+            hd_cells = HDCells(
+                n_cells=flags.num_hd_cells
+            )
 
-                
-                
-            # Network inputs
-            if flags.hd_integration:
-                self.inputs = tf.stack([ego_v, theta_x, theta_y], axis=-1)
-            else:
-                self.inputs = tf.stack([ego_v, tf.cos(target_hd), tf.sin(target_hd)], axis=-1)
+            place_init = place_cells.get_activation(init_pos)
+            self.place_init = tf.squeeze(place_init, axis=1)
+            hd_init = hd_cells.get_activation(init_hd)
+            self.hd_init = tf.squeeze(hd_init, axis=1)
+            self.place_outputs = place_cells.get_activation(self.target_pos)
+            self.hd_outputs = hd_cells.get_activation(self.target_hd)
 
             # Drop out probability
             self.keep_prob = tf.constant(flags.keep_prob, dtype=tf.float32)
