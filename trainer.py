@@ -23,11 +23,8 @@ class Trainer(object):
                 learning_rate=flags.learning_rate,
             )
             
-            # Nonnegativity constraint on g (breaking the g -> -g symmetry
+            # Nonnegativity constraint on g (breaking the g -> -g symmetry)
             nonneg_g = -tf.reduce_sum(tf.minimum(self.model.g, 0)) * flags.nonneg_obj
-#             g = self.model.g
-#             g = g / tf.reduce_max(g)
-#             nonneg_g = tf.reduce_sum(g**3) * 1e-5
 
             # l2 constraint on g
             l2_g = tf.nn.l2_loss(self.model.g)
@@ -36,8 +33,6 @@ class Trainer(object):
             l2_win = tf.nn.l2_loss(tf.trainable_variables('model/dense/kernel'))
             l2_win += tf.nn.l2_loss(tf.trainable_variables('model/dense_1/kernel'))
 
-            rnn_kernel = tf.trainable_variables('model/rnn/basic_rnn_cell/kernel')
-            sparse_rnn = tf.reduce_sum(tf.abs(rnn_kernel))
 
             total_loss = self.model.place_loss + \
                 self.model.hd_loss + \

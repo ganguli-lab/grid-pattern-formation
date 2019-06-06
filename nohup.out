@@ -19483,3 +19483,434 @@ totalMemory: 11.91GiB freeMemory: 10.97GiB
 2019-05-22 22:36:06.760548: I tensorflow/core/common_runtime/gpu/gpu_device.cc:988]      0 
 2019-05-22 22:36:06.760559: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1001] 0:   N 
 2019-05-22 22:36:06.760890: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10610 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:1a:00.0, compute capability: 6.1)
+2019-06-03 14:53:26.583221: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-03 14:53:28.795433: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:3d:00.0
+totalMemory: 11.91GiB freeMemory: 11.39GiB
+2019-06-03 14:53:28.795513: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-03 14:53:29.224643: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-03 14:53:29.224706: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-03 14:53:29.224716: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-03 14:53:29.225022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11020 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:3d:00.0, compute capability: 6.1)
+Traceback (most recent call last):
+  File "main.py", line 90, in <module>
+    tf.app.run()
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/app.py", line 125, in run
+    _sys.exit(main(argv))
+  File "main.py", line 83, in main
+    saver, start_step = load_checkpoints(sess)
+  File "main.py", line 20, in load_checkpoints
+    saver.restore(sess, checkpoint.model_checkpoint_path)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1759, in restore
+    err, "a mismatch between the current graph and the graph")
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Restoring from checkpoint failed. This is most likely due to a mismatch between the current graph and the graph from the checkpoint. Please ensure that you have not altered the graph expected based on the checkpoint. Original error:
+
+Assign requires shapes of both tensors to match. lhs shape= [512] rhs shape= [128]
+	 [[Node: save/Assign_4 = Assign[T=DT_FLOAT, _class=["loc:@model/rnn/basic_rnn_cell/bias"], use_locking=true, validate_shape=true, _device="/job:localhost/replica:0/task:0/device:GPU:0"](model/rnn/basic_rnn_cell/bias, save/RestoreV2/_9)]]
+
+Caused by op u'save/Assign_4', defined at:
+  File "main.py", line 90, in <module>
+    tf.app.run()
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/app.py", line 125, in run
+    _sys.exit(main(argv))
+  File "main.py", line 83, in main
+    saver, start_step = load_checkpoints(sess)
+  File "main.py", line 15, in load_checkpoints
+    saver = tf.train.Saver(max_to_keep=2)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1281, in __init__
+    self.build()
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1293, in build
+    self._build(self._filename, build_save=True, build_restore=True)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1330, in _build
+    build_save=build_save, build_restore=build_restore)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 778, in _build_internal
+    restore_sequentially, reshape)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 419, in _AddRestoreOps
+    assign_ops.append(saveable.restore(saveable_tensors, shapes))
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 112, in restore
+    self.op.get_shape().is_fully_defined())
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/ops/state_ops.py", line 216, in assign
+    validate_shape=validate_shape)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/ops/gen_state_ops.py", line 60, in assign
+    use_locking=use_locking, name=name)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/util/deprecation.py", line 454, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/ops.py", line 3155, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/ops.py", line 1717, in __init__
+    self._traceback = tf_stack.extract_stack()
+
+InvalidArgumentError (see above for traceback): Restoring from checkpoint failed. This is most likely due to a mismatch between the current graph and the graph from the checkpoint. Please ensure that you have not altered the graph expected based on the checkpoint. Original error:
+
+Assign requires shapes of both tensors to match. lhs shape= [512] rhs shape= [128]
+	 [[Node: save/Assign_4 = Assign[T=DT_FLOAT, _class=["loc:@model/rnn/basic_rnn_cell/bias"], use_locking=true, validate_shape=true, _device="/job:localhost/replica:0/task:0/device:GPU:0"](model/rnn/basic_rnn_cell/bias, save/RestoreV2/_9)]]
+
+2019-06-03 14:54:02.980534: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-03 14:54:05.444982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:3d:00.0
+totalMemory: 11.91GiB freeMemory: 11.75GiB
+2019-06-03 14:54:05.445059: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-03 14:54:05.838456: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-03 14:54:05.838501: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-03 14:54:05.838507: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-03 14:54:05.838752: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11374 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:3d:00.0, compute capability: 6.1)
+2019-06-04 18:33:06.292061: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-04 18:33:08.577325: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:3f:00.0
+totalMemory: 11.91GiB freeMemory: 11.75GiB
+2019-06-04 18:33:08.577443: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-04 18:33:09.002107: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-04 18:33:09.002167: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-04 18:33:09.002174: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-04 18:33:09.002454: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11374 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:3f:00.0, compute capability: 6.1)
+2019-06-04 18:34:11.766066: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-04 18:34:14.220119: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:3f:00.0
+totalMemory: 11.91GiB freeMemory: 11.75GiB
+2019-06-04 18:34:14.220174: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-04 18:34:14.695402: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-04 18:34:14.695446: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-04 18:34:14.695453: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-04 18:34:14.695728: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11374 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:3f:00.0, compute capability: 6.1)
+2019-06-05 15:54:13.902134: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-05 15:54:16.462981: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:3d:00.0
+totalMemory: 11.91GiB freeMemory: 11.75GiB
+2019-06-05 15:54:16.463053: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-05 15:54:16.889703: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-05 15:54:16.889751: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-05 15:54:16.889758: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-05 15:54:16.890046: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11374 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:3d:00.0, compute capability: 6.1)
+2019-06-05 15:58:41.262303: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-05 15:58:43.590517: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:3f:00.0
+totalMemory: 11.91GiB freeMemory: 11.75GiB
+2019-06-05 15:58:43.590575: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-05 15:58:43.976648: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-05 15:58:43.976688: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-05 15:58:43.976706: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-05 15:58:43.976925: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11374 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:3f:00.0, compute capability: 6.1)
+2019-06-05 16:04:15.357003: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-05 16:04:17.030528: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:40:00.0
+totalMemory: 11.91GiB freeMemory: 11.75GiB
+2019-06-05 16:04:17.030598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-05 16:04:17.425434: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-05 16:04:17.425485: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-05 16:04:17.425493: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-05 16:04:17.425792: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11374 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:40:00.0, compute capability: 6.1)
+Traceback (most recent call last):
+  File "main.py", line 90, in <module>
+    tf.app.run()
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/app.py", line 125, in run
+    _sys.exit(main(argv))
+  File "main.py", line 83, in main
+    saver, start_step = load_checkpoints(sess)
+  File "main.py", line 20, in load_checkpoints
+    saver.restore(sess, checkpoint.model_checkpoint_path)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1759, in restore
+    err, "a mismatch between the current graph and the graph")
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Restoring from checkpoint failed. This is most likely due to a mismatch between the current graph and the graph from the checkpoint. Please ensure that you have not altered the graph expected based on the checkpoint. Original error:
+
+Assign requires shapes of both tensors to match. lhs shape= [256,128] rhs shape= [256,512]
+	 [[Node: save/Assign = Assign[T=DT_FLOAT, _class=["loc:@model/dense/kernel"], use_locking=true, validate_shape=true, _device="/job:localhost/replica:0/task:0/device:GPU:0"](model/dense/kernel, save/RestoreV2/_1)]]
+
+Caused by op u'save/Assign', defined at:
+  File "main.py", line 90, in <module>
+    tf.app.run()
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/app.py", line 125, in run
+    _sys.exit(main(argv))
+  File "main.py", line 83, in main
+    saver, start_step = load_checkpoints(sess)
+  File "main.py", line 15, in load_checkpoints
+    saver = tf.train.Saver(max_to_keep=2)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1281, in __init__
+    self.build()
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1293, in build
+    self._build(self._filename, build_save=True, build_restore=True)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 1330, in _build
+    build_save=build_save, build_restore=build_restore)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 778, in _build_internal
+    restore_sequentially, reshape)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 419, in _AddRestoreOps
+    assign_ops.append(saveable.restore(saveable_tensors, shapes))
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/training/saver.py", line 112, in restore
+    self.op.get_shape().is_fully_defined())
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/ops/state_ops.py", line 216, in assign
+    validate_shape=validate_shape)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/ops/gen_state_ops.py", line 60, in assign
+    use_locking=use_locking, name=name)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/util/deprecation.py", line 454, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/ops.py", line 3155, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/ops.py", line 1717, in __init__
+    self._traceback = tf_stack.extract_stack()
+
+InvalidArgumentError (see above for traceback): Restoring from checkpoint failed. This is most likely due to a mismatch between the current graph and the graph from the checkpoint. Please ensure that you have not altered the graph expected based on the checkpoint. Original error:
+
+Assign requires shapes of both tensors to match. lhs shape= [256,128] rhs shape= [256,512]
+	 [[Node: save/Assign = Assign[T=DT_FLOAT, _class=["loc:@model/dense/kernel"], use_locking=true, validate_shape=true, _device="/job:localhost/replica:0/task:0/device:GPU:0"](model/dense/kernel, save/RestoreV2/_1)]]
+
+2019-06-05 16:05:48.394489: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-06-05 16:05:50.069584: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: TITAN X (Pascal) major: 6 minor: 1 memoryClockRate(GHz): 1.531
+pciBusID: 0000:40:00.0
+totalMemory: 11.91GiB freeMemory: 11.75GiB
+2019-06-05 16:05:50.069631: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2019-06-05 16:05:50.451079: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-06-05 16:05:50.451123: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2019-06-05 16:05:50.451131: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2019-06-05 16:05:50.451397: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11374 MB memory) -> physical GPU (device: 0, name: TITAN X (Pascal), pci bus id: 0000:40:00.0, compute capability: 6.1)
+Could not find old checkpoint
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Checkpoint saved
+Che

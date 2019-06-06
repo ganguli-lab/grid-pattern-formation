@@ -30,18 +30,13 @@ class PlaceCells(object):
         
         outputs = tf.nn.softmax(unnor_logpdf)
         
+        # Difference of gaussians tuning curve
         if self.DOG:
             logpdf2 = -(norm2) / (2.0 * 3 * self.sigma_sq)
             outputs -= tf.nn.softmax(logpdf2)
             outputs += tf.abs(tf.reduce_min(outputs, axis=-1)[..., tf.newaxis])
             outputs /= tf.reduce_sum(outputs, axis=-1)[..., tf.newaxis]
             
-        
-        
-#         # Envelope
-#         radius = tf.cast(tf.reduce_sum(self.us[np.newaxis, np.newaxis, ...]**2, axis=-1), tf.float32)
-#         outputs *= tf.exp(-radius / (2 * 0.4**2))
-        
         return outputs 
 
     def get_nearest_cell_pos(self, activation):
