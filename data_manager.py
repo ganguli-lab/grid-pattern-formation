@@ -213,3 +213,17 @@ class MetaDataManager(object):
 
         return batch
 
+
+def get_test_batch(flags):
+    """ Returns placeholders for all trajectory quantities """
+    init_x = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_x')
+    init_y = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_y')
+    init_hd = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_hd')
+    ego_v = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='ego_v')
+    theta_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='theta_x')
+    theta_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='theta_y')
+    target_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_x')
+    target_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_y')
+    target_hd = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_hd')
+
+    return init_x, init_y, init_hd, ego_v, theta_x, theta_y, target_hd, target_y, target_hd

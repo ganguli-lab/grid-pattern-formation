@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import tensorflow as tf
 
-from data_manager import DataManager, MetaDataManager
+from data_manager import DataManager, MetaDataManager, get_test_batch
 from place_cells import PlaceCells
 from hd_cells import HDCells
 
@@ -9,11 +9,18 @@ from hd_cells import HDCells
 class Model(object):
     def __init__(self, flags):
         with tf.variable_scope("model"):
-            if flags.meta:
-                data_manager = MetaDataManager(flags)
-            else:
-                data_manager = DataManager(flags)
-            batch = data_manager.get_batch()
+
+            # Prepare trajectories
+            if flags.train_or_test=='train':
+                # When training, load data from TFRecord files
+                if flags.meta:
+                    data_manager = MetaDataManager(flags)
+                else:
+                    data_manager = DataManager(flags)
+                batch = data_manager.get_batch()
+            elif flags.train_or_test=='test':
+                # For more flexible testing, load data from feed dicts
+                batch = get_test_batch(flags)
 
             init_x, init_y, init_hd, ego_v, theta_x,  \
                 theta_y, target_x, target_y, target_hd = batch
