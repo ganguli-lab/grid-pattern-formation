@@ -27,7 +27,8 @@ class Model(object):
                 n_cells=flags.num_place_cells,
                 std=flags.place_cell_rf,
                 pos_min=-flags.env_size,
-                pos_max=flags.env_size
+                pos_max=flags.env_size,
+                DOG = flags.DOG
             )
             hd_cells = HDCells(
                 n_cells=flags.num_hd_cells

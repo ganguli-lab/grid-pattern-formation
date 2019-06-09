@@ -6,7 +6,7 @@ import numpy as np
 class DataManager(object):
     def __init__(self, flags):
         self.flags = flags
-        root = ''
+        root = 'data/'
         basepath = flags.dataset
         base = os.path.join(root, basepath)
 
@@ -97,7 +97,7 @@ class DataManager(object):
 class MetaDataManager(object):
     def __init__(self, flags):
         self.flags = flags
-        root = ''
+        root = 'data/'
         basepath = flags.dataset
         base = os.path.join(root, basepath)
 

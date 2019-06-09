@@ -7,6 +7,7 @@ from model import Model
 from trainer import Trainer
 from options import get_options
 import visualize
+import pickle
 
 flags = get_options()
 
@@ -40,6 +41,25 @@ def save_checkponts(sess, saver, global_step):
         sess, checkpoint_dir + '/' + 'checkpoint', global_step=global_step
     )
     print("Checkpoint saved")
+
+
+def save_params(sess):
+    """ Save training parameters to file inside checkpoints folder. """
+    checkpoint_dir = flags.save_dir + "/checkpoints_" + flags.run_ID
+
+    attrs = dir(flags)
+    params = {}
+    for i in range(len(attrs)):
+        params[attrs[i]] = getattr(flags, attrs[i])
+        
+    # Save to pickle
+    with open(checkpoint_dir + '/params.pkl', 'wb') as f:
+        pickle.dump(params, f, pickle.HIGHEST_PROTOCOL)
+
+    # Save to txt
+    with open(checkpoint_dir + '/params.txt', 'wb') as f:
+        for K, V in params.items():
+            f.write(K + "\t" + str(V) + "\n")
 
 
 def train(
@@ -81,6 +101,9 @@ def main(argv):
 
     # Load checkpoints
     saver, start_step = load_checkpoints(sess)
+
+    # Save params to file
+    save_params(sess)
 
     # Train
     train(sess, model, trainer, saver, summary_writer, start_step)
