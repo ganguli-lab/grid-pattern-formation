@@ -14,7 +14,7 @@ flags = get_options()
 
 def load_checkpoints(sess):
     saver = tf.train.Saver(max_to_keep=2)
-    checkpoint_dir = flags.save_dir + "/checkpoints_" + flags.run_ID
+    checkpoint_dir = flags.save_dir + "/" + flags.run_ID + "/ckpts"
 
     checkpoint = tf.train.get_checkpoint_state(checkpoint_dir)
     if checkpoint and checkpoint.model_checkpoint_path:
@@ -36,7 +36,7 @@ def load_checkpoints(sess):
 
 
 def save_checkponts(sess, saver, global_step):
-    checkpoint_dir = flags.save_dir + "/checkpoints_" + flags.run_ID
+    checkpoint_dir = flags.save_dir + "/" + flags.run_ID + "/ckpts"
     saver.save(
         sess, checkpoint_dir + '/' + 'checkpoint', global_step=global_step
     )
@@ -45,7 +45,7 @@ def save_checkponts(sess, saver, global_step):
 
 def save_params(sess):
     """ Save training parameters to file inside checkpoints folder. """
-    checkpoint_dir = flags.save_dir + "/checkpoints_" + flags.run_ID
+    checkpoint_dir = flags.save_dir + "/" + flags.run_ID
 
     attrs = dir(flags)
     params = {}
@@ -85,8 +85,12 @@ def train(
 def main(argv):
     np.random.seed(1)
 
+    ckpt_dir = flags.save_dir + "/ckpts"
+    log_dir = flags.save_dir + "/logs"
     if not os.path.exists(flags.save_dir):
         os.mkdir(flags.save_dir)
+        os.mkdir(ckpt_dir)
+        os.mkdir(log_dir)
 
     model = Model(flags)
     trainer = Trainer(model, flags)
@@ -96,7 +100,8 @@ def main(argv):
     sess.run(tf.global_variables_initializer())
 
     # For Tensorboard log
-    log_dir = flags.save_dir + "/log/train_" + flags.run_ID
+
+    log_dir = flags.save_dir + "/" + flags.run_ID + "/log"
     summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
 
     # Load checkpoints

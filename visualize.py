@@ -110,11 +110,7 @@ def save_visualization(sess, model, save_name, step, flags):
         images.append(im)
 
     concated_image = concat_images_in_rows(images, 32, resolution*2)
-    imdir = "images/" + save_name
-    if not os.path.exists('images'):
-        os.mkdir('images')
-    if not os.path.exists(imdir):
-        os.mkdir(imdir)
+    imdir = flags.save_dir + "/" + flags.run_ID
     imsave(imdir + "/" + str(step+1) + ".png", concated_image)
 
 
