@@ -89,8 +89,6 @@ def main(argv):
     log_dir = flags.save_dir + "/logs"
     if not os.path.exists(flags.save_dir):
         os.mkdir(flags.save_dir)
-        os.mkdir(ckpt_dir)
-        os.mkdir(log_dir)
 
     model = Model(flags)
     trainer = Trainer(model, flags)

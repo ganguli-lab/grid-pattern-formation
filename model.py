@@ -54,6 +54,7 @@ class Model(object):
             if flags.RNN_type == 'LSTM':
                 self.cell = tf.nn.rnn_cell.LSTMCell(flags.rnn_size, state_is_tuple=True)
             elif flags.RNN_type == 'RNN':
+                # self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, activation=tf.keras.layers.Activation('relu'))
                 self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size)
 
             # init cell
