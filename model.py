@@ -11,14 +11,14 @@ class Model(object):
         with tf.variable_scope("model"):
 
             # Prepare trajectories
-            if flags.train_or_test=='train':
+            if flags.train_or_test == 'train':
                 # When training, load data from TFRecord files
                 if flags.meta:
                     data_manager = MetaDataManager(flags)
                 else:
                     data_manager = DataManager(flags)
                 batch = data_manager.get_batch()
-            elif flags.train_or_test=='test':
+            elif flags.train_or_test == 'test':
                 # For more flexible testing, load data from feed dicts
                 batch = get_test_batch(flags)
 
@@ -54,7 +54,7 @@ class Model(object):
             if flags.RNN_type == 'LSTM':
                 self.cell = tf.nn.rnn_cell.LSTMCell(flags.rnn_size, state_is_tuple=True)
             elif flags.RNN_type == 'RNN':
-                # self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, activation=tf.keras.layers.Activation('relu'))
+                # self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, activation=tf.keras.layers.Activation('softplus'))
                 self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size)
 
             # init cell
