@@ -25,7 +25,13 @@ class Model(object):
             init_x, init_y, init_hd, ego_v, theta_x,  \
                 theta_y, target_x, target_y, target_hd = batch
 
-            self.inputs = tf.stack([ego_v, theta_x, theta_y], axis=-1)
+            # # Network must integrate head direction
+            # self.inputs = tf.stack([ego_v, theta_x, theta_y], axis=-1)
+
+            # Give network head direction 
+            self.inputs = tf.stack([ego_v*tf.cos(target_hd), ego_v*tf.sin(target_hd)], axis=-1)
+            # self.inputs = tf.stack([ego_v, tf.cos(target_hd), tf.sin(target_hd)], axis=-1)
+
             init_pos = tf.stack([init_x, init_y], axis=-1)
             self.target_pos = tf.stack([target_x, target_y], axis=-1)
             self.target_hd = tf.expand_dims(target_hd, axis=-1)
@@ -54,8 +60,9 @@ class Model(object):
             if flags.RNN_type == 'LSTM':
                 self.cell = tf.nn.rnn_cell.LSTMCell(flags.rnn_size, state_is_tuple=True)
             elif flags.RNN_type == 'RNN':
-                # self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, activation=tf.keras.layers.Activation('softplus'))
-                self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size)
+                self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, 
+                    activation=tf.keras.layers.Activation(flags.activation))
+                
 
             # init cell
             self.l0 = tf.layers.dense(self.place_init, flags.rnn_size, use_bias=False) + \
