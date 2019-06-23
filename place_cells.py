@@ -11,9 +11,12 @@ class PlaceCells(object):
         self.n_cells = n_cells
         self.sigma_sq = std * std
         self.DOG = DOG
+        self.pos_min = pos_min
+        self.pos_max = pos_max
 
         # # Place cells on a grid
-        # grid_x, grid_y = np.mgrid[pos_min:pos_max:16j, pos_min:pos_max:16j]
+        # coords = np.linspace(pos_min, pos_max, n_cells)
+        # grid_x, grid_y = np.meshgrid(coords, coords)
         # self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
 
         # # Random place cell means
@@ -24,8 +27,8 @@ class PlaceCells(object):
         """
         Returns place cell outputs for an input trajectory
         """
-        d1 = pos[:, :, tf.newaxis, :] - self.us[np.newaxis, np.newaxis, ...]
-        d = tf.minimum(d1, 2.2 - d1)
+        d1 = tf.abs(pos[:, :, tf.newaxis, :] - self.us[np.newaxis, np.newaxis, ...])
+        d = tf.minimum(d1, 2*self.pos_max - d1)  # for periodic boundaries
         norm2 = tf.reduce_sum(d**2, axis=-1)
         unnor_logpdf = -(norm2) / (2.0 * self.sigma_sq)
 

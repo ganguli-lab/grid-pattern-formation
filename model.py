@@ -22,17 +22,16 @@ class Model(object):
                 # For more flexible testing, load data from feed dicts
                 batch = get_test_batch(flags)
 
-            init_x, init_y, init_hd, ego_v, theta_x,  \
-                theta_y, target_x, target_y, target_hd = batch
+            init_x, init_y, init_hd, ego_v, phi_x,  \
+                phi_y, target_x, target_y, target_hd = batch
 
             # # Network must integrate head direction
-            # self.inputs = tf.stack([ego_v, theta_x, theta_y], axis=-1)
+            # self.inputs = tf.stack([ego_v, phi_x, phi_y], axis=-1)
 
             # Give network head direction 
             self.inputs = tf.stack([ego_v*tf.cos(target_hd), ego_v*tf.sin(target_hd)], axis=-1)
-            # self.inputs = tf.stack([ego_v, tf.cos(target_hd), tf.sin(target_hd)], axis=-1)
 
-            init_pos = tf.stack([init_x, init_y], axis=-1)
+            self.init_pos = tf.stack([init_x, init_y], axis=-1)
             self.target_pos = tf.stack([target_x, target_y], axis=-1)
             self.target_hd = tf.expand_dims(target_hd, axis=-1)
 
@@ -47,7 +46,7 @@ class Model(object):
                 n_cells=flags.num_hd_cells
             )
 
-            place_init = place_cells.get_activation(init_pos)
+            place_init = place_cells.get_activation(self.init_pos)
             self.place_init = tf.squeeze(place_init, axis=1)
             hd_init = hd_cells.get_activation(init_hd)
             self.hd_init = tf.squeeze(hd_init, axis=1)

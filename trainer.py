@@ -13,11 +13,11 @@ class Trainer(object):
         with tf.variable_scope("opt"):
             output_vars = tf.trainable_variables("model/outputs")
 
-            # Apply L2 regularization to output linear layers
-            l2_loss = tf.add_n([
-                tf.nn.l2_loss(v) for v in output_vars
-                if 'bias' not in v.name
-            ]) * flags.l2_reg
+            # # Apply L2 regularization to output linear layers
+            # l2_loss = tf.add_n([
+            #     tf.nn.l2_loss(v) for v in output_vars
+            #     if 'bias' not in v.name
+            # ]) * flags.l2_reg
 
             optimizer = tf.train.AdamOptimizer(
                 learning_rate=flags.learning_rate,
@@ -27,7 +27,7 @@ class Trainer(object):
             nonneg_g = -tf.reduce_sum(tf.minimum(self.model.g, 0)) * flags.nonneg_obj
 
             # l2 constraint on g
-            l2_g = tf.nn.l2_loss(self.model.g)
+            l2_g = tf.nn.l2_loss(self.model.g) * flags.l2_reg
         
             # l2 constraint on input weights
             l2_win = tf.nn.l2_loss(tf.trainable_variables('model/dense/kernel'))
@@ -40,7 +40,7 @@ class Trainer(object):
 
             total_loss = self.model.place_loss + \
                 self.model.hd_loss + \
-                l2_loss + nonneg_g + frob_loss
+                l2_g + nonneg_g + frob_loss
             
             # Compute gradients
             gvs = optimizer.compute_gradients(total_loss)

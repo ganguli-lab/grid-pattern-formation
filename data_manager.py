@@ -39,11 +39,11 @@ class DataManager(object):
                 tf.FixedLenFeature(
                     shape=[self.flags.sequence_length],
                     dtype=tf.float32),
-            'theta_x':
+            'phi_x':
                 tf.FixedLenFeature(
                     shape=[self.flags.sequence_length],
                     dtype=tf.float32),
-            'theta_y':
+            'phi_y':
                 tf.FixedLenFeature(
                     shape=[self.flags.sequence_length],
                     dtype=tf.float32),
@@ -66,8 +66,8 @@ class DataManager(object):
             example['init_y'],
             example['init_hd'],
             example['ego_v'],
-            example['theta_x'],
-            example['theta_y'],
+            example['phi_x'],
+            example['phi_y'],
             example['target_x'],
             example['target_y'],
             example['target_hd']
@@ -130,11 +130,11 @@ class MetaDataManager(object):
                 tf.FixedLenFeature(
                     shape=[self.flags.sequence_length],
                     dtype=tf.float32),
-            'theta_x':
+            'phi_x':
                 tf.FixedLenFeature(
                     shape=[self.flags.sequence_length],
                     dtype=tf.float32),
-            'theta_y':
+            'phi_y':
                 tf.FixedLenFeature(
                     shape=[self.flags.sequence_length],
                     dtype=tf.float32),
@@ -175,8 +175,8 @@ class MetaDataManager(object):
             example['init_y'],
             example['init_hd'],
             example['ego_v'],
-            example['theta_x'],
-            example['theta_y'],
+            example['phi_x'],
+            example['phi_y'],
             example['target_x'],
             example['target_y'],
             example['target_hd'],
@@ -220,8 +220,8 @@ def get_test_batch(flags):
     init_y = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_y')
     init_hd = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_hd')
     ego_v = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='ego_v')
-    theta_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='theta_x')
-    theta_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='theta_y')
+    phi_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='phi_x')
+    phi_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='phi_y')
     target_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_x')
     target_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_y')
     target_hd = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_hd')
