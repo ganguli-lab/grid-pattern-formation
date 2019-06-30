@@ -13,7 +13,7 @@ flags = get_options()
 
 
 def load_checkpoints(sess):
-    saver = tf.train.Saver(max_to_keep=2)
+    saver = tf.train.Saver(max_to_keep=100)
     checkpoint_dir = flags.save_dir + "/" + flags.run_ID + "/ckpts"
 
     checkpoint = tf.train.get_checkpoint_state(checkpoint_dir)
@@ -21,7 +21,7 @@ def load_checkpoints(sess):
         saver.restore(sess, checkpoint.model_checkpoint_path)
 
         tokens = checkpoint.model_checkpoint_path.split("-")
-        step = int(tokens[1])
+        step = int(tokens[-1])
         print(
             "Loaded checkpoint: {0}, step={1}".format(
                 checkpoint.model_checkpoint_path, step

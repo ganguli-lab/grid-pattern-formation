@@ -40,7 +40,7 @@ class Model(object):
                 std=flags.place_cell_rf,
                 pos_min=-flags.env_size,
                 pos_max=flags.env_size,
-                DOG = flags.DOG
+                DoG = flags.DoG
             )
             hd_cells = HDCells(
                 n_cells=flags.num_hd_cells
