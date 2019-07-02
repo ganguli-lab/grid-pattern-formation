@@ -6,6 +6,7 @@ import tensorflow as tf
 from model import Model
 from trainer import Trainer
 from options import get_options
+from data_manager import DataManager
 import visualize
 import pickle
 
@@ -63,16 +64,51 @@ def save_params(sess):
 
 
 def train(
-    sess, model, trainer, saver, summary_writer, start_step
+    sess, model, trainer, saver, summary_writer, start_step, data_manager
 ):
     for i in range(start_step, flags.steps):
-        trainer.train(sess, summary_writer, step=i, flags=flags)
+        trainer.train(sess, summary_writer, data_manager, step=i, flags=flags)
 
         if i % flags.save_interval == flags.save_interval - 1:
             save_checkponts(sess, saver, i)
             save_name = flags.run_ID
             visualize.save_visualization(
-                sess, model, save_name, step=i, flags=flags
+                sess, model, save_name, data_manager, step=i, flags=flags
+            )
+
+        # if (i + 1) % (10 * flags.save_interval) == 0:
+        #     save_name = flags.run_ID
+        #     visualize.save_autocorr(
+        #         sess, model, save_name, step=(i + 1), flags=flags
+        #     )
+
+
+def meta_train(
+    sess, model, trainer, saver, summary_writer, start_step, data_manager
+):
+    
+    # Initialize with standard box
+    box_width = flags.box_width
+    box_height = flags.box_height
+
+    for i in range(start_step, flags.steps):
+        # Every 1000 iters, generate a new training environment
+        if np.mod(i+1, flags.meta_interval) == 0:
+            box_width = np.random.uniform(0.5, 1.5)
+            box_height = np.random.uniform(0.5, 1.5)
+            print('box width: ' + str(np.round(box_width, 2)))
+            print('box height: ' + str(np.round(box_height, 2)))
+
+        trainer.train(sess, summary_writer,
+                        data_manager, step=i,
+                        flags=flags, box_width=box_width,
+                        box_height=box_height)
+
+        if i % flags.save_interval == flags.save_interval - 1:
+            save_checkponts(sess, saver, i)
+            save_name = flags.run_ID
+            visualize.save_visualization(
+                sess, model, save_name, data_manager, step=i, flags=flags
             )
 
         # if (i + 1) % (10 * flags.save_interval) == 0:
@@ -92,13 +128,13 @@ def main(argv):
 
     model = Model(flags)
     trainer = Trainer(model, flags)
+    data_manager = DataManager(flags)
 
     sess = tf.Session()
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
 
     # For Tensorboard log
-
     log_dir = flags.save_dir + "/" + flags.run_ID + "/log"
     summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
 
@@ -109,7 +145,10 @@ def main(argv):
     save_params(sess)
 
     # Train
-    train(sess, model, trainer, saver, summary_writer, start_step)
+    if flags.meta:
+        meta_train(sess, model, trainer, saver, summary_writer, start_step, data_manager)
+    else:
+        train(sess, model, trainer, saver, summary_writer, start_step, data_manager)
 
 
 if __name__ == '__main__':

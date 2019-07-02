@@ -1,71 +1,67 @@
 # -*- coding: utf-8 -*-
 import tensorflow as tf
 
-from data_manager import DataManager, MetaDataManager, get_test_batch
 from place_cells import PlaceCells
 from hd_cells import HDCells
+from data_manager import TFDataManager
 
 
 class Model(object):
     def __init__(self, flags):
         with tf.variable_scope("model"):
 
-            # Prepare trajectories
-            if flags.train_or_test == 'train':
-                # When training, load data from TFRecord files
-                if flags.meta:
-                    data_manager = MetaDataManager(flags)
-                else:
-                    data_manager = DataManager(flags)
-                batch = data_manager.get_batch()  # Acquire batch
-            elif flags.train_or_test == 'test':
-                # For more flexible testing, load data from feed dicts
-                batch = get_test_batch(flags)
+            if flags.train_or_test=='train':
+                # For faster training, use TFRecords dataset.
+                data_manager = TFDataManager(flags)
+                batch = data_manager.get_batch()
+                init_x, init_y, init_hd, ego_v, phi_x,  \
+                    phi_y, target_x, target_y, target_hd = batch
+                box_width = flags.box_width
+                box_height = flags.box_height
+            else:
+                # For more flexible testing, use placeholders and feed dicts.
+                init_x = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_x')
+                init_y = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_y')
+                init_hd = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='init_hd')
+                ego_v = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='ego_v')
+                phi_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='phi_x')
+                phi_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='phi_y')
+                target_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_x')
+                target_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_y')
+                target_hd = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_hd')
+                box_width = tf.placeholder(dtype=tf.float32, shape=[], name='box_width')
+                box_height = tf.placeholder(dtype=tf.float32, shape=[], name='box_height')
 
-            init_x, init_y, init_hd, ego_v, phi_x,  \
-                phi_y, target_x, target_y, target_hd = batch[:9]
-
-            # # Network must integrate head direction
-            # self.inputs = tf.stack([ego_v, phi_x, phi_y], axis=-1)
-
-            # Give network head direction 
-            self.inputs = tf.stack([ego_v*tf.cos(target_hd), ego_v*tf.sin(target_hd)], axis=-1)
+            if flags.hd_integration:
+                # Network must integrate head direction
+                self.inputs = tf.stack([ego_v, phi_x, phi_y], axis=-1)
+            else:
+                # Provide network head direction 
+                self.inputs = tf.stack([ego_v*tf.cos(target_hd), ego_v*tf.sin(target_hd)], axis=-1)
 
             self.init_pos = tf.stack([init_x, init_y], axis=-1)
             self.target_pos = tf.stack([target_x, target_y], axis=-1)
             self.target_hd = tf.expand_dims(target_hd, axis=-1)
 
+            # Compute place/hd cell outputs
+            place_cells = PlaceCells(
+                n_cells=flags.num_place_cells,
+                std=flags.place_cell_rf,
+                box_width=box_width,
+                box_height=box_height,
+                DoG = flags.DoG,
+                periodic = flags.periodic
+            )
+            hd_cells = HDCells(
+                n_cells=flags.num_hd_cells
+            )
 
-            if flags.meta:
-                # When meta-learning, load place/hd cell outputs
-                self.place_init, self.hd_init, place_outputs, hd_outputs = batch[-4:]
-                self.place_outputs = tf.reshape(
-                                        place_outputs, 
-                                        (-1, flags.sequence_length, flags.num_place_cells)
-                                    )
-                self.hd_outputs = tf.reshape(
-                                        hd_outputs, 
-                                        (-1, flags.sequence_length, flags.num_hd_cells)
-                                    )
-            else:
-                # Otherwise, compute place/hd cell outputs
-                place_cells = PlaceCells(
-                    n_cells=flags.num_place_cells,
-                    std=flags.place_cell_rf,
-                    pos_min=-flags.env_size,
-                    pos_max=flags.env_size,
-                    DoG = flags.DoG
-                )
-                hd_cells = HDCells(
-                    n_cells=flags.num_hd_cells
-                )
-
-                place_init = place_cells.get_activation(self.init_pos)
-                self.place_init = tf.squeeze(place_init, axis=1)
-                hd_init = hd_cells.get_activation(init_hd)
-                self.hd_init = tf.squeeze(hd_init, axis=1)
-                self.place_outputs = place_cells.get_activation(self.target_pos)
-                self.hd_outputs = hd_cells.get_activation(self.target_hd)
+            place_init = place_cells.get_activation(self.init_pos)
+            self.place_init = tf.squeeze(place_init, axis=1)
+            hd_init = hd_cells.get_activation(init_hd)
+            self.hd_init = tf.squeeze(hd_init, axis=1)
+            self.place_outputs = place_cells.get_activation(self.target_pos)
+            self.hd_outputs = hd_cells.get_activation(self.target_hd)
 
             # Drop out probability
             self.keep_prob = tf.constant(flags.keep_prob, dtype=tf.float32)
@@ -128,13 +124,9 @@ class Model(object):
                             labels=place_outputs_reshaped,
                             logits=place_logits
                         )
-#                         tf.losses.mean_squared_error(
-#                             labels=place_outputs_reshaped,
-#                             predictions=place_logits)
                     )
                     
                     self.place_outputs_result = tf.nn.softmax(place_logits)
-
                     
     
                     self.place_accuracy = tf.reduce_mean(

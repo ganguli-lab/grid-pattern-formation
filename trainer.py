@@ -8,6 +8,7 @@ class Trainer(object):
         self.model = model
         self._prepare_optimizer(flags)
         self._prepare_summary()
+        self.flags=flags
 
     def _prepare_optimizer(self, flags):
         with tf.variable_scope("opt"):
@@ -75,9 +76,19 @@ class Trainer(object):
             # tf.summary.scalar("hd_accuracy", self.model.hd_accuracy)
         self.summary_op = tf.summary.merge_all()
 
-    def train(self, sess, summary_writer, step, flags):
-
-        _, summary_str = sess.run([self.train_op, self.summary_op])
+    def train(self, sess, summary_writer, data_manager, step, flags, box_width=None, box_height=None):
+        if not box_width:
+            box_width = flags.box_width
+        if not box_height:
+            box_height = flags.box_height
+            
+        # Train a batch
+        if flags.train_or_test=='test':
+            feed_dict = data_manager.feed_dict(box_width, box_height)
+            _, summary_str = sess.run([self.train_op, self.summary_op], feed_dict=feed_dict)
+        else:
+            _, summary_str = sess.run([self.train_op, self.summary_op])
 
         if step % 10 == 0:
             summary_writer.add_summary(summary_str, step)
+

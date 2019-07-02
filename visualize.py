@@ -61,7 +61,13 @@ def convert_to_colomap(im, cmap):
     return im
 
 
-def save_visualization(sess, model, save_name, step, flags):
+def save_visualization(sess, model, save_name, data_manager,
+                       step, flags, box_width=None, box_height=None):
+
+    if not box_width:
+        box_width = flags.box_width
+    if not box_height:
+        box_height = flags.box_height
     batch_size = flags.batch_size
     sequence_length = flags.sequence_length
     resolution = 20
@@ -73,7 +79,11 @@ def save_visualization(sess, model, save_name, step, flags):
     index_size = 100
 
     for index in range(index_size):
-        g, place_pos_batch = sess.run([model.g, model.target_pos])
+        if flags.train_or_test=='test':
+            feed_dict = data_manager.feed_dict(box_width, box_height)
+            g, place_pos_batch = sess.run([model.g, model.target_pos], feed_dict=feed_dict)
+        else:
+            g, place_pos_batch = sess.run([model.g, model.target_pos])
         place_pos_batch = np.reshape(place_pos_batch, [-1, 2])
 
         for i in range(batch_size * sequence_length):
@@ -105,7 +115,6 @@ def save_visualization(sess, model, save_name, step, flags):
         im = cv2.resize(im,
                         dsize=(resolution*2, resolution*2),
                         interpolation=cv2.INTER_NEAREST)
-        # (40, 40, 4), uint8
 
         images.append(im)
 

@@ -5,45 +5,45 @@ import tensorflow as tf
 
 
 class PlaceCells(object):
-    def __init__(
-        self, n_cells=256, std=0.01, pos_min=-1.1, pos_max=1.1, DoG=False
-    ):
+    def __init__(self, n_cells=256, std=0.01,
+                 box_width=1.1, box_height=1.1,
+                 DoG=False, periodic=False):
         self.n_cells = n_cells
         self.sigma_sq = std * std
         self.DoG = DoG
-        self.pos_min = pos_min
-        self.pos_max = pos_max
+        self.box_width = box_width
+        self.box_height = box_height
+        self.periodic = periodic
 
-        # Place cells on a grid
-        coords = np.linspace(pos_min, pos_max, int(np.sqrt(n_cells)))
-        grid_x, grid_y = np.meshgrid(coords, coords)
-        self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
+        # # Place cells on a grid
+        # coords = np.linspace(-box_width, box_width, int(np.sqrt(n_cells)))
+        # grid_x, grid_y = np.meshgrid(coords, coords)
+        # self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
+
+        # # Random place cell means
+        # r = np.random.RandomState(seed=300)
+        # usx = r.uniform(-box_width, box_width, n_cells)
+        # usy = r.uniform(-box_height, box_height, n_cells)
+        # self.us = np.stack([usx, usy], axis=-1)
 
         # Random place cell means
-        # r = np.random.RandomState(seed=300)
-        # self.us = r.uniform(pos_min, pos_max, [n_cells, 2])
-
-        # # Periodic rectangle
-        # r = np.random.RandomState(seed=300)
-        # usx = r.uniform(pos_min, pos_max, n_cells)
-        # usy = r.uniform(pos_min+0.2, pos_max-0.2, n_cells)
-        # self.us = np.stack([usx, usy], axis=-1)
+        usx = tf.random_uniform((n_cells,), -box_width, box_width, seed=300)
+        usy = tf.random_uniform((n_cells,), -box_height, box_height, seed=301)
+        self.us = tf.Variable(tf.stack([usx, usy], axis=-1))
 
     def get_activation(self, pos):
         """
         Returns place cell outputs for an input trajectory
         """
-        d = tf.abs(pos[:, :, tf.newaxis, :] - self.us[np.newaxis, np.newaxis, ...])
+        d = tf.abs(pos[:, :, tf.newaxis, :] - self.us[np.newaxis, tf.newaxis, ...])
+        print(d.shape)
 
-        # periodic boundaries
-        # d = tf.minimum(d, 2*self.pos_max - d)  # for periodic boundaries
-
-        # # # periodic rectangle 
-        # dx = tf.gather(d, 0, axis=-1)
-        # dy = tf.gather(d, 1, axis=-1)
-        # dx = tf.minimum(dx, 2*self.pos_max - dx) 
-        # dy = tf.minimum(dy, 2*(self.pos_max-0.2) - dy)
-        # d = tf.stack([dx,dy], axis=-1)
+        if self.periodic:
+            dx = tf.gather(d, 0, axis=-1)
+            dy = tf.gather(d, 1, axis=-1)
+            dx = tf.minimum(dx, 2*self.box_width - dx) 
+            dy = tf.minimum(dy, 2*self.box_height - dy)
+            d = tf.stack([dx,dy], axis=-1)
 
         norm2 = tf.reduce_sum(d**2, axis=-1)
         unnor_logpdf = -(norm2) / (2.0 * self.sigma_sq)
@@ -60,5 +60,5 @@ class PlaceCells(object):
         return outputs
 
     def get_nearest_cell_pos(self, activation):
-        index = np.argmax(activation)
-        return self.us[index]
+        index = tf.argmax(activation, axis=-1)
+        return tf.gather(self.us, index)
