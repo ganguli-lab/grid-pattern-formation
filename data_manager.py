@@ -97,7 +97,7 @@ class DataManager(object):
 class MetaDataManager(object):
     def __init__(self, flags):
         self.flags = flags
-        root = 'data/'
+        root = '/data3/bsorsch/mouse_trajectories/'
         basepath = flags.dataset
         base = os.path.join(root, basepath)
 
@@ -187,24 +187,42 @@ class MetaDataManager(object):
         ]
         return batch
 
+#     def get_batch(self):
+        
+#         datasets = [
+#             tf.data.TFRecordDataset(file).map(self.parser).shuffle(self.flags.batch_size).batch(self.flags.batch_size).repeat()
+#                     for file in self.filenames
+#         ]
+#         choice_idxs = tf.cast(np.repeat(np.arange(10), 1100), tf.int64)  # remember to make room for visualization
+#         choice_dataset = tf.data.Dataset.from_tensor_slices(choice_idxs).repeat()
+#         dataset = tf.contrib.data.choose_from_datasets(datasets, choice_dataset)
+        
+# #         # If want to simply shuffle different boxes
+# #         dataset = tf.data.TFRecordDataset(self.filenames)
+# #         dataset = dataset.map(self.parser)
+# #         num_traj = self.num_files * self.num_traj_per_file
+# #         dataset = dataset.shuffle(buffer_size=num_traj)
+# #         num_epochs = self.flags.steps // self.flags.batch_size
+# #         dataset = dataset.batch(self.flags.batch_size)
+# #         dataset = dataset.repeat()
+        
+
+#         iterator = dataset.make_one_shot_iterator()
+
+#         batch = iterator.get_next()
+
+#         return batch
+
     def get_batch(self):
-        
-        datasets = [
-            tf.data.TFRecordDataset(file).map(self.parser).shuffle(self.flags.batch_size).batch(self.flags.batch_size).repeat()
-                    for file in self.filenames
-        ]
-        choice_idxs = tf.cast(np.repeat(np.arange(10), 1100), tf.int64)  # remember to make room for visualization
-        choice_dataset = tf.data.Dataset.from_tensor_slices(choice_idxs).repeat()
-        dataset = tf.contrib.data.choose_from_datasets(datasets, choice_dataset)
-        
-#         # If want to simply shuffle different boxes
-#         dataset = tf.data.TFRecordDataset(self.filenames)
-#         dataset = dataset.map(self.parser)
-#         num_traj = self.num_files * self.num_traj_per_file
-#         dataset = dataset.shuffle(buffer_size=num_traj)
-#         num_epochs = self.flags.steps // self.flags.batch_size
-#         dataset = dataset.batch(self.flags.batch_size)
-#         dataset = dataset.repeat()
+
+        # Define dataset
+        dataset = tf.data.TFRecordDataset(self.filenames)
+        dataset = dataset.map(self.parser)
+        num_traj = self.num_files * self.num_traj_per_file
+        dataset = dataset.shuffle(buffer_size=num_traj)
+        num_epochs = self.flags.steps // self.flags.batch_size
+        dataset = dataset.batch(self.flags.batch_size)
+        dataset = dataset.repeat()
         
 
         iterator = dataset.make_one_shot_iterator()
@@ -226,4 +244,4 @@ def get_test_batch(flags):
     target_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_y')
     target_hd = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_hd')
 
-    return init_x, init_y, init_hd, ego_v, theta_x, theta_y, target_hd, target_y, target_hd
+    return init_x, init_y, init_hd, ego_v, phi_x, phi_y, target_hd, target_y, target_hd

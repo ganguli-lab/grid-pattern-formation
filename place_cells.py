@@ -14,14 +14,14 @@ class PlaceCells(object):
         self.pos_min = pos_min
         self.pos_max = pos_max
 
-        # # Place cells on a grid
-        # coords = np.linspace(pos_min, pos_max, n_cells)
-        # grid_x, grid_y = np.meshgrid(coords, coords)
-        # self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
+        # Place cells on a grid
+        coords = np.linspace(pos_min, pos_max, int(np.sqrt(n_cells)))
+        grid_x, grid_y = np.meshgrid(coords, coords)
+        self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
 
         # Random place cell means
-        r = np.random.RandomState(seed=300)
-        self.us = r.uniform(pos_min, pos_max, [n_cells, 2])
+        # r = np.random.RandomState(seed=300)
+        # self.us = r.uniform(pos_min, pos_max, [n_cells, 2])
 
         # # Periodic rectangle
         # r = np.random.RandomState(seed=300)
@@ -36,7 +36,7 @@ class PlaceCells(object):
         d = tf.abs(pos[:, :, tf.newaxis, :] - self.us[np.newaxis, np.newaxis, ...])
 
         # periodic boundaries
-        d = tf.minimum(d, 2*self.pos_max - d)  # for periodic boundaries
+        # d = tf.minimum(d, 2*self.pos_max - d)  # for periodic boundaries
 
         # # # periodic rectangle 
         # dx = tf.gather(d, 0, axis=-1)

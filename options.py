@@ -13,17 +13,17 @@ def get_options():
     tf.app.flags.DEFINE_integer("save_interval", 1000, "saving interval")
     tf.app.flags.DEFINE_float("keep_prob", 0.5, "dropout rate")
     tf.app.flags.DEFINE_float("learning_rate", 1e-4, "learning rate")
-    tf.app.flags.DEFINE_float("l2_reg", 0, "weight decay")
+    tf.app.flags.DEFINE_float("l2_reg", 1e-5, "weight decay")
     tf.app.flags.DEFINE_float("gradient_clipping", 1e-5, "gradient clipping")
-    tf.app.flags.DEFINE_integer("num_place_cells", 512, "number place cells")
-    tf.app.flags.DEFINE_float("place_cell_rf", 0.2, "receptive field")
+    tf.app.flags.DEFINE_integer("num_place_cells", 256, "number place cells")
+    tf.app.flags.DEFINE_float("place_cell_rf", 0.18, "receptive field")
     tf.app.flags.DEFINE_integer("num_hd_cells", 12, "number hd cells")
     tf.app.flags.DEFINE_float("hd_cell_rf", 20., "hd cell receptive field")
     tf.app.flags.DEFINE_string("RNN_type", "RNN", "recurrent cell type")
     tf.app.flags.DEFINE_string("activation", "relu", "RNN activation func")
     tf.app.flags.DEFINE_float("nonneg_obj", 0, "strength nonneg constraint")
-    tf.app.flags.DEFINE_float("frobenius", 0, "low-rank regularization")
-    tf.app.flags.DEFINE_bool("meta", False, "perform meta-learning")
+    tf.app.flags.DEFINE_float("frobenius", 1e-3, "low-rank regularization")
+    tf.app.flags.DEFINE_bool("meta", True, "perform meta-learning")
     tf.app.flags.DEFINE_bool("place_outputs", True, "use place cell outputs")
     tf.app.flags.DEFINE_bool("hd_integration", False, "perform hd integration")
     tf.app.flags.DEFINE_bool("DoG", True, "difference of gaussians")
@@ -31,7 +31,7 @@ def get_options():
     tf.app.flags.DEFINE_integer("num_g_cells", 1024, "num grid cells")
     tf.app.flags.DEFINE_integer("rnn_size", 1024, "num units in RNN")
     tf.app.flags.DEFINE_float("env_size", 1.1, "environment size")
-    tf.app.flags.DEFINE_string("dataset", '10_step_periodic_new', "filepath")
+    tf.app.flags.DEFINE_string("dataset", '10_step_10_boxes_rf_2_DoG', "filepath")
     run_ID = generate_run_ID(tf.app.flags.FLAGS)
     tf.app.flags.DEFINE_string("run_ID", run_ID, "save_ID")
     return tf.app.flags.FLAGS
@@ -64,6 +64,7 @@ def generate_run_ID(flags):
     run_ID = run_ID.replace('.', '')
 
 
-    # run_ID = 'tune_frobenius_rectangle'
+    # run_ID = 'tune_frobenius_3'
+    # run_ID = 'steps_10_batch_200_RNN_1024_relu_rf_02_dense_False_DoG_True_nonneg_00_lr_00001_l2_1e-05_frobenius_0001_drop_05_10_step_new'
 
     return run_ID

@@ -17,13 +17,13 @@ class Model(object):
                     data_manager = MetaDataManager(flags)
                 else:
                     data_manager = DataManager(flags)
-                batch = data_manager.get_batch()
+                batch = data_manager.get_batch()  # Acquire batch
             elif flags.train_or_test == 'test':
                 # For more flexible testing, load data from feed dicts
                 batch = get_test_batch(flags)
 
             init_x, init_y, init_hd, ego_v, phi_x,  \
-                phi_y, target_x, target_y, target_hd = batch
+                phi_y, target_x, target_y, target_hd = batch[:9]
 
             # # Network must integrate head direction
             # self.inputs = tf.stack([ego_v, phi_x, phi_y], axis=-1)
@@ -35,23 +35,37 @@ class Model(object):
             self.target_pos = tf.stack([target_x, target_y], axis=-1)
             self.target_hd = tf.expand_dims(target_hd, axis=-1)
 
-            place_cells = PlaceCells(
-                n_cells=flags.num_place_cells,
-                std=flags.place_cell_rf,
-                pos_min=-flags.env_size,
-                pos_max=flags.env_size,
-                DoG = flags.DoG
-            )
-            hd_cells = HDCells(
-                n_cells=flags.num_hd_cells
-            )
 
-            place_init = place_cells.get_activation(self.init_pos)
-            self.place_init = tf.squeeze(place_init, axis=1)
-            hd_init = hd_cells.get_activation(init_hd)
-            self.hd_init = tf.squeeze(hd_init, axis=1)
-            self.place_outputs = place_cells.get_activation(self.target_pos)
-            self.hd_outputs = hd_cells.get_activation(self.target_hd)
+            if flags.meta:
+                # When meta-learning, load place/hd cell outputs
+                self.place_init, self.hd_init, place_outputs, hd_outputs = batch[-4:]
+                self.place_outputs = tf.reshape(
+                                        place_outputs, 
+                                        (-1, flags.sequence_length, flags.num_place_cells)
+                                    )
+                self.hd_outputs = tf.reshape(
+                                        hd_outputs, 
+                                        (-1, flags.sequence_length, flags.num_hd_cells)
+                                    )
+            else:
+                # Otherwise, compute place/hd cell outputs
+                place_cells = PlaceCells(
+                    n_cells=flags.num_place_cells,
+                    std=flags.place_cell_rf,
+                    pos_min=-flags.env_size,
+                    pos_max=flags.env_size,
+                    DoG = flags.DoG
+                )
+                hd_cells = HDCells(
+                    n_cells=flags.num_hd_cells
+                )
+
+                place_init = place_cells.get_activation(self.init_pos)
+                self.place_init = tf.squeeze(place_init, axis=1)
+                hd_init = hd_cells.get_activation(init_hd)
+                self.hd_init = tf.squeeze(hd_init, axis=1)
+                self.place_outputs = place_cells.get_activation(self.target_pos)
+                self.hd_outputs = hd_cells.get_activation(self.target_hd)
 
             # Drop out probability
             self.keep_prob = tf.constant(flags.keep_prob, dtype=tf.float32)
