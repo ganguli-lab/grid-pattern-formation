@@ -29,8 +29,6 @@ class Model(object):
                 target_x = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_x')
                 target_y = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_y')
                 target_hd = tf.placeholder(dtype=tf.float32, shape=[None, flags.sequence_length], name='target_hd')
-                box_width = tf.placeholder(dtype=tf.float32, shape=[], name='box_width')
-                box_height = tf.placeholder(dtype=tf.float32, shape=[], name='box_height')
 
             if flags.hd_integration:
                 # Network must integrate head direction
@@ -44,11 +42,11 @@ class Model(object):
             self.target_hd = tf.expand_dims(target_hd, axis=-1)
 
             # Compute place/hd cell outputs
-            place_cells = PlaceCells(
+            self.place_cells = PlaceCells(
                 n_cells=flags.num_place_cells,
                 std=flags.place_cell_rf,
-                box_width=box_width,
-                box_height=box_height,
+                box_width=flags.box_width,
+                box_height=flags.box_height,
                 DoG = flags.DoG,
                 periodic = flags.periodic
             )
@@ -56,11 +54,11 @@ class Model(object):
                 n_cells=flags.num_hd_cells
             )
 
-            place_init = place_cells.get_activation(self.init_pos)
+            place_init = self.place_cells.get_activation(self.init_pos)
             self.place_init = tf.squeeze(place_init, axis=1)
             hd_init = hd_cells.get_activation(init_hd)
             self.hd_init = tf.squeeze(hd_init, axis=1)
-            self.place_outputs = place_cells.get_activation(self.target_pos)
+            self.place_outputs = self.place_cells.get_activation(self.target_pos)
             self.hd_outputs = hd_cells.get_activation(self.target_hd)
 
             # Drop out probability
@@ -69,9 +67,13 @@ class Model(object):
             if flags.RNN_type == 'LSTM':
                 self.cell = tf.nn.rnn_cell.LSTMCell(flags.rnn_size, state_is_tuple=True)
             elif flags.RNN_type == 'RNN':
-                self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, 
-                    activation=tf.keras.layers.Activation(flags.activation))
-                
+                if flags.activation=='leaky_relu':
+                    self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, 
+                        # activation=tf.keras.layers.Activation(flags.activation))
+                        activation=tf.keras.layers.LeakyReLU())
+                else:
+                    self.cell = tf.nn.rnn_cell.BasicRNNCell(flags.rnn_size, 
+                        activation=tf.keras.layers.Activation(flags.activation))
 
             # init cell
             self.l0 = tf.layers.dense(self.place_init, flags.rnn_size, use_bias=False) + \
@@ -119,11 +121,26 @@ class Model(object):
                         shape=[-1, flags.num_place_cells]
                     )
 
+                    # ########
+                    # def weighted_softmax_cross_entropy(logits, labels, weights):
+                    #     q = tf.nn.softmax(logits)
+                    #     return -tf.reduce_sum(labels * weights * tf.log(q), axis=-1)
+
+
+                    # self.place_loss = tf.reduce_mean(
+                    #         weighted_softmax_cross_entropy(
+                    #             place_logits,
+                    #             place_outputs_reshaped,
+                    #             self.place_cells.envelope
+                    #             )
+                    #     )
+                    # #########
+
                     self.place_loss = tf.reduce_mean(
                         tf.nn.softmax_cross_entropy_with_logits_v2(
                             labels=place_outputs_reshaped,
                             logits=place_logits
-                        )
+                        ) 
                     )
                     
                     self.place_outputs_result = tf.nn.softmax(place_logits)

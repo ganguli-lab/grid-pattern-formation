@@ -137,8 +137,6 @@ class DataManager(object):
             'model/target_x:0': batch['target_x'],
             'model/target_y:0': batch['target_y'],
             'model/target_hd:0': batch['target_hd'],
-            'model/box_width:0': box_width,
-            'model/box_height:0': box_height
         }
 
         return feed_dict

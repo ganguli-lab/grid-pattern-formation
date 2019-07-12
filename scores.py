@@ -14,7 +14,6 @@
 # ==============================================================================
 
 """Grid score calculations.
-
 """
 
 from __future__ import absolute_import
@@ -47,7 +46,6 @@ class GridScorer(object):
 
   def __init__(self, nbins, coords_range, mask_parameters, min_max=False):
     """Scoring ratemaps given trajectories.
-
     Args:
       nbins: Number of bins per dimension in the ratemap.
       coords_range: Environment coordinates range.
@@ -175,7 +173,8 @@ class GridScorer(object):
     max_60_ind = np.argmax(scores_60)
     max_90_ind = np.argmax(scores_90)
 
-    return (max_60_ind, max_90_ind, sac)
+    return (scores_60[max_60_ind], scores_90[max_90_ind],
+            self._masks[max_60_ind][1], self._masks[max_90_ind][1], sac)
 
   def plot_ratemap(self, ratemap, ax=None, title=None, *args, **kwargs):  # pylint: disable=keyword-arg-before-vararg
     """Plot ratemaps."""

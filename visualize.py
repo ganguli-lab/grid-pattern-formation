@@ -124,7 +124,7 @@ def save_visualization(sess, model, save_name, data_manager,
 
 
 
-def save_autocorr(sess, model, save_name, step, flags):
+def save_autocorr(sess, model, save_name, data_manager, step, flags):
     starts = [0.2] * 10
     ends = np.linspace(0.4, 1.0, num=10)
     coord_range=((-1.1, 1.1), (-1.1, 1.1))
@@ -134,13 +134,15 @@ def save_autocorr(sess, model, save_name, step, flags):
     res = dict()
     index_size = 100
     for _ in range(index_size):
+      feed_dict = data_manager.feed_dict(flags.box_width, flags.box_height)
       mb_res = sess.run({
           'pos_xy': model.target_pos,
           'bottleneck': model.g,
-      })
+      }, feed_dict=feed_dict)
       res = utils.concat_dict(res, mb_res)
         
-    filename = save_name + '/autocorrs_' + str(step) + '.pdf'
+    filename = save_name + '/autocorrs_' + str(step+1) + '.pdf'
+    imdir = flags.save_dir + '/'
     out = utils.get_scores_and_plot(
                 latest_epoch_scorer, res['pos_xy'], res['bottleneck'],
-                'images/', filename)
+                imdir, filename)

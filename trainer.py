@@ -18,7 +18,13 @@ class Trainer(object):
             l2_out = tf.add_n([
                 tf.nn.l2_loss(v) for v in output_vars
                 if 'bias' not in v.name
-            ]) * flags.l2_reg
+            ]) * flags.l2_reg 
+
+
+            # # VAR OUT
+            # W = tf.trainable_variables('model/outputs/dense/kernel')[0]
+            # Wout = tf.reduce_sum(W**2, axis=-1)
+            # var = tf.reduce_mean((Wout-tf.reduce_mean(Wout))**2) * flags.l2_reg
 
             optimizer = tf.train.AdamOptimizer(
                 learning_rate=flags.learning_rate,
@@ -31,19 +37,38 @@ class Trainer(object):
             # l2_g = tf.nn.l2_loss(self.model.g) * flags.l2_reg
         
             # l2 constraint on input weights
-            l2_win = tf.nn.l2_loss(tf.trainable_variables('model/dense/kernel'))
-            l2_win += tf.nn.l2_loss(tf.trainable_variables('model/dense_1/kernel'))
+            # l2_win = tf.nn.l2_loss(tf.trainable_variables('model/dense/kernel')) * flags.l2_reg
+            # l2_win += tf.nn.l2_loss(tf.trainable_variables('model/dense_1/kernel'))
+
+
+            # Whitening penalty
+            # G = self.model.g
+            # C = tf.matmul(tf.transpose(G), G)
+            # Ctri = C - tf.diag_part(C) * tf.eye(flags.rnn_size)
+            # white_penalty = tf.reduce_sum(Ctri**2) * 1e-5
+
+            # G = self.model.g
+            # C = tf.matmul(tf.transpose(G), G)
+            # white_penalty = tf.reduce_sum((C-tf.eye(flags.rnn_size))**2) * 1e-3
+
 
             # Frobenius norm on recurrent weights
-            Jall = tf.trainable_variables('model/rnn/basic_rnn_cell/kernel')[0]
-            J = tf.gather(Jall, np.arange(flags.rnn_size)+3)
-            frob_loss = tf.trace(tf.matmul(J, tf.transpose(J))) * flags.frobenius
+            # Jall = tf.trainable_variables('model/rnn/basic_rnn_cell/kernel')[0]
+            # J = tf.gather(Jall, np.arange(flags.rnn_size)+2)
+            # frob_loss = tf.trace(tf.matmul(J, tf.transpose(J))) * flags.frobenius
+
+
+            # Antisymmetric penalty
+            # asymm = tf.reduce_sum((J - tf.transpose(J))**2) * flags.l2_reg
+
 
             total_loss = self.model.place_loss + \
-                self.model.hd_loss + \
-                l2_out + nonneg_g  \
-                + frob_loss
-            
+                self.model.hd_loss \
+                + nonneg_g  \
+                + l2_out
+                # + white_penalty
+
+
             # Compute gradients
             gvs = optimizer.compute_gradients(total_loss)
 
