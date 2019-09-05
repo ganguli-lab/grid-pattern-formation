@@ -22,18 +22,20 @@ class PlaceCells(object):
         # # Place cells on a grid
         # coords = np.linspace(-box_width, box_width, int(np.sqrt(n_cells)))
         # grid_x, grid_y = np.meshgrid(coords, coords)
-        # self.us = np.stack([grid_x.ravel(), grid_y.ravel()]).T
+        # usx = grid_x.ravel().astype(np.float32)
+        # usy = grid_y.ravel().astype(np.float32)
+        # self.us = tf.Variable(np.stack([usx, usy], axis=-1), name='place_cell_us', trainable=False)
 
         # Random place cell means
         r = np.random.RandomState(seed=300)
         usx = r.uniform(-box_width, box_width, (n_cells,)).astype(np.float32)
         usy = r.uniform(-box_height, box_height, (n_cells,)).astype(np.float32)
-        # self.us = np.stack([usx, usy], axis=-1)
+        self.us = tf.Variable(np.stack([usx, usy], axis=-1), name='place_cell_us', trainable=False)
 
         # Random place cell means
         # usx = tf.random_uniform((n_cells,), -box_width, box_width, seed=300)
         # usy = tf.random_uniform((n_cells,), -box_height, box_height, seed=301)
-        self.us = tf.Variable(np.stack([usx, usy], axis=-1), name='place_cell_us', trainable=False)
+        # self.us = tf.Variable(np.stack([usx, usy], axis=-1), name='place_cell_us', trainable=False)
 
 
         # Envelope function 

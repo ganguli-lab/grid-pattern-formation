@@ -121,7 +121,7 @@ class Model(object):
                         shape=[-1, flags.num_place_cells]
                     )
 
-                    # ########
+                    # # ########
                     # def weighted_softmax_cross_entropy(logits, labels, weights):
                     #     q = tf.nn.softmax(logits)
                     #     return -tf.reduce_sum(labels * weights * tf.log(q), axis=-1)

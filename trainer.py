@@ -34,7 +34,7 @@ class Trainer(object):
             nonneg_g = -tf.reduce_sum(tf.minimum(self.model.g, 0)) * flags.nonneg_obj
 
             # # l2 constraint on g
-            # l2_g = tf.nn.l2_loss(self.model.g) * flags.l2_reg
+            l2_g = tf.nn.l2_loss(self.model.g) * flags.l2_reg
         
             # l2 constraint on input weights
             # l2_win = tf.nn.l2_loss(tf.trainable_variables('model/dense/kernel')) * flags.l2_reg
@@ -65,7 +65,7 @@ class Trainer(object):
             total_loss = self.model.place_loss + \
                 self.model.hd_loss \
                 + nonneg_g  \
-                + l2_out
+                + l2_g
                 # + white_penalty
 
 
@@ -78,8 +78,9 @@ class Trainer(object):
                     gv = (tf.clip_by_value(grad,
                                            -flags.gradient_clipping,
                                            flags.gradient_clipping), var)
+                # # Train recurrent weights more slowly
                 # elif "basic_rnn_cell/kernel" in var.name:
-                #     gv = (tf.clip_by_value(grad, 0, 0), var)
+                #     gv = (1e-2*grad, var)
                 else:
                     gv = (grad, var)
                 clipped_gvs.append(gv)

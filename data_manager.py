@@ -16,6 +16,8 @@ class DataManager(object):
         x = position[:,0]
         y = position[:,1]
         dists = [box_width-x, box_height-y, box_width+x, box_height+y]
+        if self.flags.extended_box:
+            dists[0] = 5*box_width-x
         d_wall = np.min(dists, axis=0)
         angles = np.arange(4)*np.pi/2
         theta = angles[np.argmin(dists, axis=0)]
@@ -45,15 +47,17 @@ class DataManager(object):
         # Initialize variables
         position = np.zeros([batch_size, samples+2, 2])
         head_dir = np.zeros([batch_size, samples+2])
-        position[:,0,0] = np.random.uniform(-box_width, box_width, batch_size)
-        position[:,0,1] = np.random.uniform(-box_height, box_height, batch_size)
+        position[:,0,0] = np.random.uniform(-1.1, 1.1, batch_size)
+        position[:,0,1] = np.random.uniform(-1.1, 1.1, batch_size)
         head_dir[:,0] = np.random.uniform(0, 2*np.pi, batch_size)
         velocity = np.zeros([batch_size, samples+2])
         
         # Generate sequence of random boosts and turns
         random_turn = np.random.normal(mu, sigma, [batch_size, samples+1])
-        random_vel = np.random.rayleigh(b, [batch_size, samples+1])
-        v = np.random.rayleigh(b, batch_size)
+        # random_vel = np.random.rayleigh(b, [batch_size, samples+1])
+        # v = np.random.rayleigh(b, batch_size)
+        random_vel = np.abs(np.random.normal(0, b*np.pi/2, [batch_size, samples+1]))
+        v = np.abs(np.random.normal(0, b*np.pi/2, batch_size))
 
         for t in range(samples+1):
             # Update velocity

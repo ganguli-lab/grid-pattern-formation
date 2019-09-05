@@ -72,7 +72,7 @@ def train(
     for i in range(start_step, flags.steps):
         trainer.train(sess, summary_writer, data_manager, step=i, flags=flags)
 
-        if i % flags.save_interval == 0 and i > 1:
+        if i % flags.save_interval == 0:
             save_checkponts(sess, saver, i)
             save_name = flags.run_ID
             visualize.save_visualization(
@@ -108,16 +108,14 @@ def meta_train(
                 sess, model, save_name, data_manager, step=i-1, flags=flags
             )
 
+        if i % (flags.meta_interval) == 0 and i > 1:
             # Generate a new training environment
-            box_width = np.random.uniform(0.8, 1.2)
-            box_height = np.random.uniform(0.8, 1.2)
+            box_width = np.random.uniform(0.9, 1.1)
+            box_height = np.random.uniform(0.9, 1.1)
 
             #Update place cell centers
             usx = np.random.uniform(-box_width, box_width, flags.num_place_cells).astype(np.float32)
             usy = np.random.uniform(-box_height, box_height, flags.num_place_cells).astype(np.float32)
-            plt.clf()
-            plt.scatter(usx, usy)
-            plt.savefig('us_scatter/' + str(i))
             us = np.stack([usx, usy], axis=-1)
             model.place_cells.us.load(us, sess)
             print('box width: ' + str(np.round(box_width, 2)))
@@ -147,6 +145,11 @@ def main(argv):
     sess = tf.Session()
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
+
+    # # Initialize RNN weights
+    # Ng = flags.num_g_cells
+    # Jinit = np.random.randn(Ng+2, Ng) / Ng
+    # tf.trainable_variables('model/rnn/basic_rnn_cell/kernel')[0].load(Jinit, sess)
 
     # For Tensorboard log
     log_dir = flags.save_dir + "/" + flags.run_ID + "/log"
