@@ -200,4 +200,3 @@ class Model(object):
                     self.place_accuracy = self.place_loss
 
                     
-              

@@ -64,8 +64,8 @@ class PlaceCells(object):
 
         # Difference of gaussians tuning curve
         if self.DoG:
-            logpdf2 = -(norm2) / (2.0 * 2 * self.sigma_sq)
-            # logpdf2 = -(norm2) / (2.0 * 3 * self.sigma_sq)
+#             logpdf2 = -(norm2) / (2.0 * 2 * self.sigma_sq)
+            logpdf2 = -(norm2) / (2.0 * 3 * self.sigma_sq)
             outputs -= tf.nn.softmax(logpdf2)
             outputs += tf.abs(tf.reduce_min(outputs, axis=-1)[..., tf.newaxis])
             outputs /= tf.reduce_sum(outputs, axis=-1)[..., tf.newaxis]

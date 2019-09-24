@@ -62,30 +62,30 @@ class Trainer(object):
             # asymm = tf.reduce_sum((J - tf.transpose(J))**2) * flags.l2_reg
 
 
-            total_loss = self.model.place_loss + \
-                self.model.hd_loss \
-                + nonneg_g  \
-                + l2_g
+            total_loss = self.model.place_loss
+#                 self.model.hd_loss \
+#                 + nonneg_g  \
+#                 + l2_g
                 # + white_penalty
 
 
             # Compute gradients
             gvs = optimizer.compute_gradients(total_loss)
 
-            clipped_gvs = []
-            for grad, var in gvs:
-                if "model/outputs" in var.name:
-                    gv = (tf.clip_by_value(grad,
-                                           -flags.gradient_clipping,
-                                           flags.gradient_clipping), var)
-                # # Train recurrent weights more slowly
-                # elif "basic_rnn_cell/kernel" in var.name:
-                #     gv = (1e-2*grad, var)
-                else:
-                    gv = (grad, var)
-                clipped_gvs.append(gv)
+#             clipped_gvs = []
+#             for grad, var in gvs:
+#                 if "model/outputs" in var.name:
+#                     gv = (tf.clip_by_value(grad,
+#                                            -flags.gradient_clipping,
+#                                            flags.gradient_clipping), var)
+#                 # # Train recurrent weights more slowly
+#                 # elif "basic_rnn_cell/kernel" in var.name:
+#                 #     gv = (1e-2*grad, var)
+#                 else:
+#                     gv = (grad, var)
+#                 clipped_gvs.append(gv)
                 
-            self.train_op = optimizer.apply_gradients(clipped_gvs)
+            self.train_op = optimizer.apply_gradients(gvs)
     
             # # Only train velocity weights
             # J = tf.trainable_variables('model/rnn/basic_rnn_cell/kernel')
