@@ -13,13 +13,13 @@ def get_options():
     options["sequence_length"] = 10
     options["learning_rate"] = 1e-4
     options["Np"] = 512               # number of place cells
-    options["Ng"] = 256               # number of grid cells
+    options["Ng"] = 1024               # number of grid cells
     options["place_cell_rf"] = 0.1 # width of place cell tuning curve
-    options["surround_width"] = 3   # width of surround
+    options["surround_width"] = 2   # factor multiplying with of center
     options["RNN_type"] = "RNN"
     options["activation"] = "relu"
     options["DoG"] = True
-    options["periodic"] = False         # periodic boundary conditions
+    options["periodic"] = True         # periodic boundary conditions
     options["box_width"] = 1.1
     options["box_height"] = 1.1
     run_ID = generate_run_ID(options)
