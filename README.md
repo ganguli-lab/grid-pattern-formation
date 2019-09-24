@@ -1,8 +1,8 @@
-# LSTM trained on a path integration task
+# Artificial neural network yields grid cells
 
 ## About
 
-Training an LSTM on a path integration task produces grid-like representations
+Training an RNN on a path integration task produces grid-like representations
 
 ## Result
 
