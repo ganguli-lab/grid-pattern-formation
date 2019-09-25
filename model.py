@@ -16,9 +16,8 @@ class RNN(Model):
                              return_sequences=True,
                              activation=tf.keras.layers.Activation(options['activation']),
                              name='RNN',
-                             recurrent_initializer='glorot_uniform',
-                             use_bias=False,
-                             activity_regularizer='l2')
+                             recurrent_initializer=tf.keras.initializers.RandomUniform(minval=-0.02,maxval=0.02),
+                             use_bias=False)
         self.decoder = Dense(self.Np, name='decoder', use_bias=False)
     
     def g(self, inputs):
@@ -33,6 +32,10 @@ class RNN(Model):
         place_preds = self.decoder(self.g(inputs))
         
         return place_preds
+
+    def nonneg_reg(self, activities):
+        return tf.reduce_sum(tf.nn.relu(-activities)) * 1e3
+
 
 
 class LSTM(Model):

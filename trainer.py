@@ -35,6 +35,7 @@ class Trainer(object):
         '''Compute cross-entropy loss'''
         loss = tf.reduce_mean(self.loss_fun(labels, preds))
         acc = tf.reduce_mean(self.acc_fun(labels, preds))
+        loss += tf.reduce_mean(self.model.RNN.weights[1]**2) * 1
         return loss, acc
 
 
@@ -72,5 +73,10 @@ class Trainer(object):
 
                 # Save a picture of rate maps
                 save_ratemaps(self.model, self.data_manager, self.options, step=tot_step)
+
+
+    def load_ckpt(self, idx):
+        '''Restore model from earlier checkpoint'''
+        self.ckpt.restore(self.ckpt_manager.checkpoints[idx])
 
             
