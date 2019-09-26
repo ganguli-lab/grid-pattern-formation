@@ -128,7 +128,7 @@ class DataManager(object):
 
             inputs = (v, init_actv)
         
-            yield (inputs, place_outputs)
+            yield (inputs, place_outputs, pos)
 
 
     def get_test_batch(self, batch_size=None, box_width=None, box_height=None):

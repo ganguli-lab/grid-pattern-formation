@@ -16,7 +16,6 @@ class RNN(Model):
                              return_sequences=True,
                              activation=tf.keras.layers.Activation(options['activation']),
                              name='RNN',
-                             recurrent_initializer=tf.keras.initializers.RandomUniform(minval=-0.02,maxval=0.02),
                              use_bias=False)
         self.decoder = Dense(self.Np, name='decoder', use_bias=False)
     
