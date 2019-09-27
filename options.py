@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 import tensorflow as tf
 import os
@@ -7,19 +9,20 @@ def get_options():
 
     options = {}
     options["save_dir"] = "/data3/bsorsch/grid_cell_models"
-    options["n_epochs"] = 20
+    options["n_epochs"] = 100
     options["n_steps"] = 500
     options["batch_size"] = 200
-    options["sequence_length"] = 11
-    options["learning_rate"] = 1e-4
+    options["sequence_length"] = 10
+    options["learning_rate"] = 1e-3
     options["Np"] = 1024               # number of place cells
     options["Ng"] = 1024               # number of grid cells
     options["place_cell_rf"] = 0.2 # width of place cell tuning curve
     options["surround_width"] = 2   # factor multiplying with of center
     options["RNN_type"] = "RNN"
-    options["activation"] = "relu"
-    options["DoG"] = False
-    options["periodic"] = True         # periodic boundary conditions
+    options["activation"] = "tanh"
+    options['nonneg_reg'] = 1e-6
+    options["DoG"] = True
+    options["periodic"] = False         # periodic boundary conditions
     options["box_width"] = 1.1
     options["box_height"] = 1.1
     run_ID = generate_run_ID(options)

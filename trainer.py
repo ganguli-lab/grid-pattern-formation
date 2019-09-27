@@ -7,14 +7,10 @@ from tqdm.autonotebook import tqdm
 
 
 class Trainer(object):
-    def __init__(self, options, model, data_manager, place_cells):
+    def __init__(self, options, model, data_manager):
         self.options = options
         self.model = model
         self.data_manager = data_manager
-        self.place_cells = place_cells
-        # self.loss_fun = tf.keras.metrics.categorical_crossentropy
-        self.loss_fun = tf.nn.softmax_cross_entropy_with_logits
-        self.acc_fun = tf.keras.metrics.categorical_accuracy
         lr = self.options['learning_rate']
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
@@ -31,21 +27,9 @@ class Trainer(object):
         else:
             print("Initializing from scratch.")
 
-
-    def compute_loss(self, labels, preds, pos):
-        '''Compute cross-entropy loss'''
-        loss = tf.reduce_mean(self.loss_fun(labels, preds))
-        acc = tf.reduce_mean(self.acc_fun(labels, preds))
-        pred_pos = self.place_cells.get_nearest_cell_pos(preds)
-        err = tf.reduce_mean(tf.sqrt(tf.reduce_sum((pos - pred_pos)**2, axis=-1)))
-        # loss += tf.reduce_mean(self.model.RNN.weights[1]**2) * 1
-        return loss, err
-
-
     def train_step(self, inputs, pc_outputs, pos):
         with tf.GradientTape() as tape:
-            preds = self.model(inputs)
-            loss, err = self.compute_loss(pc_outputs, preds, pos)
+            loss, err = self.model.compute_loss(inputs, pc_outputs, pos)
 
         grads = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
@@ -56,6 +40,10 @@ class Trainer(object):
     def train(self, n_epochs=10, n_steps=100, save=True):
         # Construct generator
         gen = self.data_manager.get_generator()
+
+        # Save at beginning of training
+        if save:
+            self.ckpt_manager.save()
 
         for epoch in tqdm(range(n_epochs)):
             t = tqdm(range(n_steps), leave=True)

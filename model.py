@@ -5,11 +5,13 @@ from tensorflow.keras.models import Model
 
 
 class RNN(Model):
-    def __init__(self, options):
+    def __init__(self, options, place_cells):
         super(RNN, self).__init__()
         self.Ng = options['Ng']
         self.Np = options['Np']
         self.sequence_length = options['sequence_length']
+        self.nonneg_reg = options['nonneg_reg']
+        self.place_cells = place_cells
 
         self.encoder = Dense(self.Ng, name='encoder', use_bias=False)
         self.RNN = SimpleRNN(self.Ng, 
@@ -18,6 +20,9 @@ class RNN(Model):
                              name='RNN',
                              use_bias=False)
         self.decoder = Dense(self.Np, name='decoder', use_bias=False)
+
+        # Loss function
+        self.loss_fun = tf.nn.softmax_cross_entropy_with_logits
     
     def g(self, inputs):
         '''Compute grid cell activations'''
@@ -32,9 +37,20 @@ class RNN(Model):
         
         return place_preds
 
-    def nonneg_reg(self, activities):
-        return tf.reduce_sum(tf.nn.relu(-activities)) * 1e3
+    def compute_loss(self, inputs, pc_outputs, pos):
+        '''Compute loss and decoding error'''
+        g = self.g(inputs)
+        preds = self.decoder(g)
+        loss = tf.reduce_mean(self.loss_fun(pc_outputs, preds))
 
+        # Nonneg reg
+        loss += self.nonneg_reg * tf.reduce_sum(tf.minimum(g,0))
+
+        # Compute decoding error
+        pred_pos = self.place_cells.get_nearest_cell_pos(preds)
+        err = tf.reduce_mean(tf.sqrt(tf.reduce_sum((pos - pred_pos)**2, axis=-1)))
+
+        return loss, err
 
 
 class LSTM(Model):

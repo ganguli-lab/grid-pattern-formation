@@ -12,6 +12,6 @@ options = get_options()
 model = RNN(options)
 place_cells = PlaceCells(options)
 data_manager = DataManager(options, place_cells)
-trainer = Trainer(options, model, data_manager)
+trainer = Trainer(options, model, data_manager, place_cells)
 
 trainer.train(n_epochs=options['n_epochs'], n_steps=options['n_steps'])
