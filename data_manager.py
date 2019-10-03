@@ -15,7 +15,7 @@ class DataManager(object):
         '''
         x = position[:,0]
         y = position[:,1]
-        dists = [box_width-x, box_height-y, box_width+x, box_height+y]
+        dists = [box_width/2-x, box_height/2-y, box_width/2+x, box_height/2+y]
         # if self.options['extended_box']:
         #     dists[0] = 5*box_width-x
         d_wall = np.min(dists, axis=0)
@@ -45,16 +45,16 @@ class DataManager(object):
         # Initialize variables
         position = np.zeros([batch_size, samples+2, 2])
         head_dir = np.zeros([batch_size, samples+2])
-        position[:,0,0] = np.random.uniform(-1.1, 1.1, batch_size)
-        position[:,0,1] = np.random.uniform(-1.1, 1.1, batch_size)
+        position[:,0,0] = np.random.uniform(-box_width/2, box_width/2, batch_size)
+        position[:,0,1] = np.random.uniform(-box_height/2, box_height/2, batch_size)
         head_dir[:,0] = np.random.uniform(0, 2*np.pi, batch_size)
         velocity = np.zeros([batch_size, samples+2])
         
         # Generate sequence of random boosts and turns
         random_turn = np.random.normal(mu, sigma, [batch_size, samples+1])
-        # random_vel = np.random.rayleigh(b, [batch_size, samples+1])
+        random_vel = np.random.rayleigh(b, [batch_size, samples+1])
         # v = np.random.rayleigh(b, batch_size)
-        random_vel = np.abs(np.random.normal(0, b*np.pi/2, [batch_size, samples+1]))
+        # random_vel = np.abs(np.random.normal(0, b*np.pi/2, [batch_size, samples+1]))
         v = np.abs(np.random.normal(0, b*np.pi/2, batch_size))
 
         for t in range(samples+1):
@@ -80,8 +80,8 @@ class DataManager(object):
 
         # Periodic boundaries
         if self.options['periodic']:
-            position[:,:,0] = np.mod(position[:,:,0] + box_width, 2*box_width) - box_width
-            position[:,:,1] = np.mod(position[:,:,1] + box_height, 2*box_height) - box_height
+            position[:,:,0] = np.mod(position[:,:,0] + box_width/2, box_width) - box_width/2
+            position[:,:,1] = np.mod(position[:,:,1] + box_height/2, box_height) - box_height/2
 
         head_dir = np.mod(head_dir + np.pi, 2*np.pi) - np.pi # Periodic variable
 
@@ -129,6 +129,7 @@ class DataManager(object):
             inputs = (v, init_actv)
         
             yield (inputs, place_outputs, pos)
+
 
 
     def get_test_batch(self, batch_size=None, box_width=None, box_height=None):

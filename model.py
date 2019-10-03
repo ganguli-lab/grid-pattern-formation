@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import tensorflow as tf
+import numpy as np
 from tensorflow.keras.layers import Input, Dense, SimpleRNN
 from tensorflow.keras.models import Model
 
@@ -16,7 +17,11 @@ class RNN(Model):
         self.encoder = Dense(self.Ng, name='encoder', use_bias=False)
         self.RNN = SimpleRNN(self.Ng, 
                              return_sequences=True,
+                             # activation=tf.keras.layers.ReLU(),
                              activation=tf.keras.layers.Activation(options['activation']),
+                             recurrent_initializer='glorot_uniform',
+                             # recurrent_initializer=tf.keras.initializers.RandomUniform(
+                             #    -1/np.sqrt(self.Ng), 1/np.sqrt(self.Ng)),
                              name='RNN',
                              use_bias=False)
         self.decoder = Dense(self.Np, name='decoder', use_bias=False)
@@ -44,7 +49,13 @@ class RNN(Model):
         loss = tf.reduce_mean(self.loss_fun(pc_outputs, preds))
 
         # Nonneg reg
-        loss += self.nonneg_reg * tf.reduce_sum(tf.minimum(g,0))
+        # loss -= self.nonneg_reg * tf.reduce_sum(tf.minimum(g,0))
+        # loss += 1e-4 * self.nonneg_reg * tf.reduce_sum(g**2) 
+
+        # # Weight regularization 
+        # loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1]**2)     # singular value penalty
+        loss += self.nonneg_reg * tf.reduce_sum(tf.abs(self.RNN.weights[1]))
+        # loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1] * tf.transpose(self.RNN.weights[1]))   # eig penalty
 
         # Compute decoding error
         pred_pos = self.place_cells.get_nearest_cell_pos(preds)

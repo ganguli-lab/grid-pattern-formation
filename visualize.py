@@ -91,8 +91,8 @@ def compute_ratemaps(model, data_manager, options, res=20, n_avg=None):
         g[index] = g_batch
         pos[index] = pos_batch
 
-        x_batch = (pos_batch[:,0] + options['box_width']) / (options['box_width'] * 2) * res
-        y_batch = (pos_batch[:,1] + options['box_height']) / (options['box_height'] * 2) * res
+        x_batch = (pos_batch[:,0] + options['box_width']/2) / (options['box_width']) * res
+        y_batch = (pos_batch[:,1] + options['box_height']/2) / (options['box_height']) * res
 
         for i in range(options['batch_size']*options['sequence_length']):
             x = x_batch[i]
@@ -116,7 +116,9 @@ def compute_ratemaps(model, data_manager, options, res=20, n_avg=None):
     return activations, rate_map, g, pos
 
 
-def save_ratemaps(model, data_manager, options, step, res=20, n_avg=100):
+def save_ratemaps(model, data_manager, options, step, res=20, n_avg=None):
+    if not n_avg:
+        n_avg = 1000 // options['sequence_length']
     activations, rate_map, g, pos = compute_ratemaps(model, data_manager, options, res=res, n_avg=n_avg)
     rm_fig = plot_ratemaps(activations, n_plots=len(activations))
     imdir = options['save_dir'] + "/" + options['run_ID']

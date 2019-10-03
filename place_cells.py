@@ -17,8 +17,8 @@ class PlaceCells(object):
         
         # Randomly tile place cell centers
         tf.random.set_seed(0)
-        usx = tf.random.uniform((self.Np,), -self.box_width, self.box_width, dtype=tf.float64)
-        usy = tf.random.uniform((self.Np,), -self.box_height, self.box_height, dtype=tf.float64)
+        usx = tf.random.uniform((self.Np,), -self.box_width/2, self.box_width/2, dtype=tf.float64)
+        usy = tf.random.uniform((self.Np,), -self.box_height/2, self.box_height/2, dtype=tf.float64)
         self.us = tf.stack([usx, usy], axis=-1)
         
     def get_activation(self, pos):
@@ -28,14 +28,15 @@ class PlaceCells(object):
         if self.is_periodic:
             dx = tf.gather(d, 0, axis=-1)
             dy = tf.gather(d, 1, axis=-1)
-            dx = tf.minimum(dx, 2*self.box_width - dx) 
-            dy = tf.minimum(dy, 2*self.box_height - dy)
+            dx = tf.minimum(dx, self.box_width - dx) 
+            dy = tf.minimum(dy, self.box_height - dy)
             d = tf.stack([dx,dy], axis=-1)
 
         norm2 = tf.reduce_sum(d**2, axis=-1)
         outputs = tf.nn.softmax(-norm2/(2*self.sigma**2))
 
         if self.DoG:
+            # outputs -= tf.nn.softmax(-norm2/(2*self.surround_width*self.sigma**2))
             outputs -= tf.nn.softmax(-norm2/(2*self.surround_width*self.sigma**2))
             outputs += tf.abs(tf.reduce_min(outputs, axis=-1, keepdims=True))
             outputs /= tf.reduce_sum(outputs, axis=-1, keepdims=True)
@@ -50,8 +51,8 @@ class PlaceCells(object):
 
     def grid_pc(self, pc_outputs, res=32):
         ''' Interpolate place cell outputs onto a grid'''
-        coordsx = np.linspace(-self.box_width, self.box_width, res)
-        coordsy = np.linspace(-self.box_height, self.box_height, res)
+        coordsx = np.linspace(-self.box_width/2, self.box_width/2, res)
+        coordsy = np.linspace(-self.box_height/2, self.box_height/2, res)
         grid_x, grid_y = np.meshgrid(coordsx, coordsy)
         grid = np.stack([grid_x.ravel(), grid_y.ravel()]).T
 
@@ -69,8 +70,8 @@ class PlaceCells(object):
 
     def compute_covariance(self, res=30):
         '''Compute spatial covariance matrix of place cell outputs'''
-        pos = np.array(np.meshgrid(np.linspace(-self.box_width, self.box_width, res),
-                         np.linspace(-self.box_height, self.box_height, res))).T
+        pos = np.array(np.meshgrid(np.linspace(-self.box_width/2, self.box_width/2, res),
+                         np.linspace(-self.box_height/2, self.box_height/2, res))).T
 
         pos = pos.astype(np.float32)
 

@@ -19,8 +19,8 @@ class Trainer(object):
 
         # Set up checkpoints
         self.ckpt = tf.train.Checkpoint(step=tf.Variable(0), optimizer=self.optimizer, net=model)
-        ckpt_dir = options['save_dir'] + '/' + options['run_ID'] + '/ckpts'
-        self.ckpt_manager = tf.train.CheckpointManager(self.ckpt, ckpt_dir, max_to_keep=100)
+        self.ckpt_dir = options['save_dir'] + '/' + options['run_ID'] + '/ckpts'
+        self.ckpt_manager = tf.train.CheckpointManager(self.ckpt, self.ckpt_dir, max_to_keep=100)
         self.ckpt.restore(self.ckpt_manager.latest_checkpoint)
         if self.ckpt_manager.latest_checkpoint:
             print("Restored from {}".format(self.ckpt_manager.latest_checkpoint))
@@ -44,6 +44,7 @@ class Trainer(object):
         # Save at beginning of training
         if save:
             self.ckpt_manager.save()
+            np.save(self.ckpt_dir + '/options.npy', self.options)
 
         for epoch in tqdm(range(n_epochs)):
             t = tqdm(range(n_steps), leave=True)
