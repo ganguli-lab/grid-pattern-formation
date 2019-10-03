@@ -1,4 +1,4 @@
-# Artificial neural network yields grid cells
+# Grid cells in artificial neural networks
 
 ## About
 
