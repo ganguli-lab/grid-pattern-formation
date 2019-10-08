@@ -53,8 +53,8 @@ class RNN(Model):
         # loss += 1e-4 * self.nonneg_reg * tf.reduce_sum(g**2) 
 
         # # Weight regularization 
-        # loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1]**2)     # singular value penalty
-        loss += self.nonneg_reg * tf.reduce_sum(tf.abs(self.RNN.weights[1]))
+        loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1]**2)     # singular value penalty
+        # loss += self.nonneg_reg * tf.reduce_sum(tf.abs(self.RNN.weights[1]))
         # loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1] * tf.transpose(self.RNN.weights[1]))   # eig penalty
 
         # Compute decoding error

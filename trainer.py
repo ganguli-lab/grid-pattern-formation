@@ -20,7 +20,7 @@ class Trainer(object):
         # Set up checkpoints
         self.ckpt = tf.train.Checkpoint(step=tf.Variable(0), optimizer=self.optimizer, net=model)
         self.ckpt_dir = options['save_dir'] + '/' + options['run_ID'] + '/ckpts'
-        self.ckpt_manager = tf.train.CheckpointManager(self.ckpt, self.ckpt_dir, max_to_keep=100)
+        self.ckpt_manager = tf.train.CheckpointManager(self.ckpt, self.ckpt_dir, max_to_keep=500)
         self.ckpt.restore(self.ckpt_manager.latest_checkpoint)
         if self.ckpt_manager.latest_checkpoint:
             print("Restored from {}".format(self.ckpt_manager.latest_checkpoint))

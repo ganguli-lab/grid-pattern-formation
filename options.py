@@ -7,8 +7,8 @@ def get_options():
 
     options = {}
     options["save_dir"] = "/data3/bsorsch/grid_cell_models"
-    options["n_epochs"] = 100
-    options["n_steps"] = 500
+    options["n_epochs"] = 5
+    options["n_steps"] = 1000
     options["batch_size"] = 200
     options["sequence_length"] = 10
     options["learning_rate"] = 1e-4
@@ -46,8 +46,7 @@ def generate_run_ID(options):
         'periodic', str(options['periodic']),
         'lr', str(options['learning_rate']),
         'nonneg_reg', str(options['nonneg_reg']),
-        'vary_length_20_100'
-        # 'small_init'
+        'vary_length'
         ]
     separator = '_'
     run_ID = separator.join(params)

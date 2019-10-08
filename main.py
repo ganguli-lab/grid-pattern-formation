@@ -15,18 +15,18 @@ data_manager = DataManager(options, place_cells)
 trainer = Trainer(options, model, data_manager)
 
 
-seq_lengths = np.arange(10,50,5)
+# seq_lengths = np.arange(10,55,5)
 
-for seq_length in seq_lengths:
-	options['sequence_length'] = seq_length
-	data_manager = DataManager(options, place_cells)
+# for seq_length in seq_lengths:
+# 	options['sequence_length'] = seq_length
+# 	data_manager = DataManager(options, place_cells)
 
-	trainer.train(n_epochs=12, n_steps=500)
+# 	trainer.train(n_epochs=options['n_epochs'], n_steps=options['n_steps'])
 
-	print('Sequence length: ' + str(seq_length))
+# 	print('Sequence length: ' + str(seq_length))
 
 
-# trainer.train(n_epochs=50, n_steps=500)
+trainer.train(n_epochs=100, n_steps=1000)
 
 
 
