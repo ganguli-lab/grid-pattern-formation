@@ -32,7 +32,20 @@ class Trainer(object):
             loss, err = self.model.compute_loss(inputs, pc_outputs, pos)
 
         grads = tape.gradient(loss, self.model.trainable_variables)
+
+        # # Clip gradients
+        # clipped_grads = []
+        # for grad in grads:
+        #     clipped_grads.append(tf.clip_by_value(grad, -1e-5, 1e-5))
+
         self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
+
+        # # Block diagonal
+        # A = np.ones([self.options['Ng']//32, self.options['Ng']//32])
+        # mask = np.kron(np.eye(32), A)
+        # # self.model.RNN.weights[1] = mask * self.model.RNN.weights[1]
+        # new_weights = [self.model.RNN.weights[0].numpy(), mask * self.model.RNN.weights[1].numpy()]
+        # self.model.RNN.set_weights(new_weights)
         
         return loss, err
 

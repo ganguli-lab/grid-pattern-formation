@@ -45,8 +45,10 @@ class DataManager(object):
         # Initialize variables
         position = np.zeros([batch_size, samples+2, 2])
         head_dir = np.zeros([batch_size, samples+2])
-        position[:,0,0] = np.random.uniform(-box_width/2, box_width/2, batch_size)
-        position[:,0,1] = np.random.uniform(-box_height/2, box_height/2, batch_size)
+        # position[:,0,0] = np.random.uniform(-box_width/2, box_width/2, batch_size)
+        # position[:,0,1] = np.random.uniform(-box_height/2, box_height/2, batch_size)
+        position[:,0,0] = np.random.uniform(-1.1, 1.1, batch_size)
+        position[:,0,1] = np.random.uniform(-1.1, 1.1, batch_size)
         head_dir[:,0] = np.random.uniform(0, 2*np.pi, batch_size)
         velocity = np.zeros([batch_size, samples+2])
         

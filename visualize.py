@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import tensorflow as tf
 from matplotlib import pyplot as plt
 
 import scipy
@@ -26,7 +27,7 @@ def concat_images(images, image_width, spacer_size):
     return ret
 
 
-def concat_images_in_rows(images, row_size, image_width, spacer_size=1):
+def concat_images_in_rows(images, row_size, image_width, spacer_size=4):
     """ Concat images in rows """
     column_size = len(images) // row_size
     spacer_h = np.ones([spacer_size, image_width*column_size + (column_size-1)*spacer_size, 4],
@@ -69,11 +70,15 @@ def plot_ratemaps(activations, n_plots, cmap='jet', smooth=True, width=16):
     return rm_fig
 
 
-def compute_ratemaps(model, data_manager, options, res=20, n_avg=None):
+def compute_ratemaps(model, data_manager, options, res=20, n_avg=None, Ng=512, idxs=None):
     '''Compute spatial firing fields'''
-    Ng = model.Ng
+
     if not n_avg:
         n_avg = 1000 // options['sequence_length']
+
+    if not np.any(idxs):
+        idxs = np.arange(Ng)
+    idxs = idxs[:Ng]
 
     g = np.zeros([n_avg, options['batch_size'] * options['sequence_length'], Ng])
     pos = np.zeros([n_avg, options['batch_size'] * options['sequence_length'], 2])
@@ -86,7 +91,7 @@ def compute_ratemaps(model, data_manager, options, res=20, n_avg=None):
         g_batch = model.g(inputs)
         
         pos_batch = np.reshape(pos_batch, [-1, 2])
-        g_batch = np.reshape(g_batch, (-1, Ng))
+        g_batch = np.reshape(tf.gather(g_batch, idxs, axis=-1), (-1, Ng))
         
         g[index] = g_batch
         pos[index] = pos_batch

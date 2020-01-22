@@ -20,6 +20,11 @@ class PlaceCells(object):
         usx = tf.random.uniform((self.Np,), -self.box_width/2, self.box_width/2, dtype=tf.float64)
         usy = tf.random.uniform((self.Np,), -self.box_height/2, self.box_height/2, dtype=tf.float64)
         self.us = tf.stack([usx, usy], axis=-1)
+
+        # # Grid place cell centers
+        # us = np.mgrid[:24,:24]/24 *self.box_width - self.box_width/2
+        # self.us = tf.transpose(tf.reshape(us, (2,-1)))
+        
         
     def get_activation(self, pos):
         '''Get place cell activations for a given position'''
@@ -45,8 +50,11 @@ class PlaceCells(object):
     
     def get_nearest_cell_pos(self, activation):
         '''Return location of maximally active place cell'''
-        idx = tf.argmax(activation, axis=-1)
-        return tf.gather(self.us, idx)
+        # idx = tf.argmax(activation, axis=-1)
+        # return tf.gather(self.us, idx)
+        _, idxs = tf.math.top_k(activation, k=3)
+        return tf.reduce_mean(tf.gather(self.us, idxs), axis=-2)
+        
 
 
     def grid_pc(self, pc_outputs, res=32):

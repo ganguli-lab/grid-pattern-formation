@@ -5,12 +5,15 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 from options import get_options
 from place_cells import PlaceCells
 from data_manager import DataManager
-from model import RNN
+from model import RNN, LSTM
 from trainer import Trainer
 
 options = get_options()
 place_cells = PlaceCells(options)
-model = RNN(options, place_cells)
+if options['RNN_type'] == 'RNN':
+	model = RNN(options, place_cells)
+elif options['RNN_type'] == 'LSTM':
+	model = LSTM(options, place_cells)
 data_manager = DataManager(options, place_cells)
 trainer = Trainer(options, model, data_manager)
 
@@ -21,12 +24,12 @@ trainer = Trainer(options, model, data_manager)
 # 	options['sequence_length'] = seq_length
 # 	data_manager = DataManager(options, place_cells)
 
-# 	trainer.train(n_epochs=options['n_epochs'], n_steps=options['n_steps'])
+# 	trainer.train(n_epochs=10, n_steps=1000)
 
 # 	print('Sequence length: ' + str(seq_length))
 
 
-trainer.train(n_epochs=100, n_steps=1000)
+trainer.train(n_epochs=300, n_steps=1000)
 
 
 
