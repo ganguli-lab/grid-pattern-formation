@@ -6,7 +6,7 @@ import os
 def get_options():
 
     options = {}
-    options["save_dir"] = "/data3/bsorsch/grid_cell_models"
+    options["save_dir"] = "/mnt/fs2/bsorsch/grid_cells/models/"
     options["n_epochs"] = 5
     options["n_steps"] = 1000
     options["batch_size"] = 200
