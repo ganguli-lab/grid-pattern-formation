@@ -4,7 +4,7 @@ import os
 
 
 def get_options():
-
+    ''' Define training parameters and hyperparameters'''
     options = {}
     options["save_dir"] = "/mnt/fs2/bsorsch/grid_cells/models/"
     options["n_epochs"] = 5

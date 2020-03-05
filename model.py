@@ -17,23 +17,19 @@ class RNN(Model):
         self.encoder = Dense(self.Ng, name='encoder', use_bias=False)
         self.RNN = SimpleRNN(self.Ng, 
                              return_sequences=True,
-                             # activation=tf.keras.layers.ReLU(),
                              activation=tf.keras.layers.Activation(options['activation']),
                              recurrent_initializer='glorot_uniform',
-                             # recurrent_initializer=tf.keras.initializers.RandomUniform(
-                             #    -1/np.sqrt(self.Ng), 1/np.sqrt(self.Ng)),
                              name='RNN',
                              use_bias=False)
         self.decoder = Dense(self.Np, name='decoder', use_bias=False)
 
         # Loss function
         self.loss_fun = tf.nn.softmax_cross_entropy_with_logits
-        # self.loss_fun = tf.keras.losses.MSE
     
     def g(self, inputs):
         '''Compute grid cell activations'''
-        v, P0 = inputs
-        init_state = self.encoder(P0)
+        v, p0 = inputs
+        init_state = self.encoder(p0)
         g = self.RNN(v, initial_state=init_state)
         return g
     
@@ -50,13 +46,7 @@ class RNN(Model):
         loss = tf.reduce_mean(self.loss_fun(pc_outputs, preds))
 
         # Weight regularization 
-        loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1]**2)     # singular value penalty
-
-        # Decoder weight penalty
-        # loss += self.nonneg_reg * tf.reduce_sum(self.decoder.weights[0]**2)
-
-        # activation loss
-        # loss += self.nonneg_reg * tf.reduce_sum(g**2)
+        loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1]**2)
 
         # Compute decoding error
         pred_pos = self.place_cells.get_nearest_cell_pos(preds)
@@ -79,10 +69,8 @@ class LSTM(Model):
         self.M = Dense(self.Ng, name='M')
         self.RNN = tf.keras.layers.LSTM(self.Ng, return_sequences=True,
                              activation=options['activation'],
-                             # recurrent_activation=options['activation'], name='RNN',
                              recurrent_initializer='glorot_uniform')
         self.dense = Dense(self.Ng, name='dense', activation=options['activation'])
-        # self.dense = Dense(self.Ng, name='dense')
         self.decoder = Dense(self.Np, name='decoder')
 
         # Loss function
@@ -90,9 +78,9 @@ class LSTM(Model):
     
     def g(self, inputs):
         '''Compute grid cell activations'''
-        v, P0 = inputs
-        l0 = self.encoder1(P0)
-        m0 = self.encoder2(P0)
+        v, p0 = inputs
+        l0 = self.encoder1(p0)
+        m0 = self.encoder2(p0)
         init_state = (l0, m0)
         Mv = self.M(v)
         rnn = self.RNN(Mv, initial_state=init_state)
@@ -111,17 +99,8 @@ class LSTM(Model):
         preds = self.decoder(g)
         loss = tf.reduce_mean(self.loss_fun(pc_outputs, preds))
 
-        # Nonneg reg
-        # loss -= self.nonneg_reg * tf.reduce_sum(tf.minimum(g,0))
-        # loss += self.nonneg_reg * tf.reduce_sum(g**2) 
-
-        # Decoder weight penalty
-        # loss += self.nonneg_reg * tf.reduce_sum(self.decoder.weights[0]**2)
-
         # # Weight regularization 
-        loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1]**2)     # singular value penalty
-        # loss += self.nonneg_reg * tf.reduce_sum(tf.abs(self.RNN.weights[1]))
-        # loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1] * tf.transpose(self.RNN.weights[1]))   # eig penalty
+        loss += self.nonneg_reg * tf.reduce_sum(self.RNN.weights[1]**2)
 
         # Compute decoding error
         pred_pos = self.place_cells.get_nearest_cell_pos(preds)

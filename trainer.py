@@ -7,10 +7,10 @@ from tqdm.autonotebook import tqdm
 
 
 class Trainer(object):
-    def __init__(self, options, model, data_manager):
+    def __init__(self, options, model, trajectory_generator):
         self.options = options
         self.model = model
-        self.data_manager = data_manager
+        self.trajectory_generator = trajectory_generator
         lr = self.options['learning_rate']
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
@@ -33,26 +33,15 @@ class Trainer(object):
 
         grads = tape.gradient(loss, self.model.trainable_variables)
 
-        # # Clip gradients
-        # clipped_grads = []
-        # for grad in grads:
-        #     clipped_grads.append(tf.clip_by_value(grad, -1e-5, 1e-5))
-
         self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
 
-        # # Block diagonal
-        # A = np.ones([self.options['Ng']//32, self.options['Ng']//32])
-        # mask = np.kron(np.eye(32), A)
-        # # self.model.RNN.weights[1] = mask * self.model.RNN.weights[1]
-        # new_weights = [self.model.RNN.weights[0].numpy(), mask * self.model.RNN.weights[1].numpy()]
-        # self.model.RNN.set_weights(new_weights)
         
         return loss, err
 
 
     def train(self, n_epochs=10, n_steps=100, save=True):
         # Construct generator
-        gen = self.data_manager.get_generator()
+        gen = self.trajectory_generator.get_generator()
 
         # Save at beginning of training
         if save:
@@ -78,7 +67,7 @@ class Trainer(object):
                 tot_step = self.ckpt.step.numpy()
 
                 # Save a picture of rate maps
-                save_ratemaps(self.model, self.data_manager, self.options, step=tot_step)
+                save_ratemaps(self.model, self.trajectory_generator, self.options, step=tot_step)
 
 
     def load_ckpt(self, idx):

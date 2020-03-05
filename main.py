@@ -4,7 +4,7 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 from options import get_options
 from place_cells import PlaceCells
-from data_manager import DataManager
+from trajectory_generator import TrajectoryGenerator
 from model import RNN, LSTM
 from trainer import Trainer
 
@@ -14,8 +14,8 @@ if options['RNN_type'] == 'RNN':
 	model = RNN(options, place_cells)
 elif options['RNN_type'] == 'LSTM':
 	model = LSTM(options, place_cells)
-data_manager = DataManager(options, place_cells)
-trainer = Trainer(options, model, data_manager)
+trajectory_generator = TrajectoryGenerator(options, place_cells)
+trainer = Trainer(options, model, trajectory_generator)
 
 
 # seq_lengths = np.arange(10,55,5)
