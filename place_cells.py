@@ -7,13 +7,13 @@ import scipy
 
 class PlaceCells(object):
     def __init__(self, options):
-        self.Np = options['Np']
-        self.sigma = options['place_cell_rf']
-        self.surround_width = options['surround_width']
-        self.box_width = options['box_width']
-        self.box_height = options['box_height']
-        self.is_periodic = options['periodic']
-        self.DoG = options['DoG']
+        self.Np = options.Np
+        self.sigma = options.place_cell_rf
+        self.surround_width = options.surround_width
+        self.box_width = options.box_width
+        self.box_height = options.box_height
+        self.is_periodic = options.periodic
+        self.DoG = options.DoG
         
         # Randomly tile place cell centers
         tf.random.set_seed(0)

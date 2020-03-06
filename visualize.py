@@ -74,14 +74,14 @@ def compute_ratemaps(model, trajectory_generator, options, res=20, n_avg=None, N
     '''Compute spatial firing fields'''
 
     if not n_avg:
-        n_avg = 1000 // options['sequence_length']
+        n_avg = 1000 // options.sequence_length
 
     if not np.any(idxs):
         idxs = np.arange(Ng)
     idxs = idxs[:Ng]
 
-    g = np.zeros([n_avg, options['batch_size'] * options['sequence_length'], Ng])
-    pos = np.zeros([n_avg, options['batch_size'] * options['sequence_length'], 2])
+    g = np.zeros([n_avg, options.batch_size * options.sequence_length, Ng])
+    pos = np.zeros([n_avg, options.batch_size * options.sequence_length, 2])
 
     activations = np.zeros([Ng, res, res]) 
     counts  = np.zeros([res, res])
@@ -96,10 +96,10 @@ def compute_ratemaps(model, trajectory_generator, options, res=20, n_avg=None, N
         g[index] = g_batch
         pos[index] = pos_batch
 
-        x_batch = (pos_batch[:,0] + options['box_width']/2) / (options['box_width']) * res
-        y_batch = (pos_batch[:,1] + options['box_height']/2) / (options['box_height']) * res
+        x_batch = (pos_batch[:,0] + options.box_width/2) / (options.box_width) * res
+        y_batch = (pos_batch[:,1] + options.box_height/2) / (options.box_height) * res
 
-        for i in range(options['batch_size']*options['sequence_length']):
+        for i in range(options.batch_size*options.sequence_length):
             x = x_batch[i]
             y = y_batch[i]
             if x >=0 and x <= res and y >=0 and y <= res:
@@ -123,10 +123,10 @@ def compute_ratemaps(model, trajectory_generator, options, res=20, n_avg=None, N
 
 def save_ratemaps(model, trajectory_generator, options, step, res=20, n_avg=None):
     if not n_avg:
-        n_avg = 1000 // options['sequence_length']
+        n_avg = 1000 // options.sequence_length
     activations, rate_map, g, pos = compute_ratemaps(model, trajectory_generator, options, res=res, n_avg=n_avg)
     rm_fig = plot_ratemaps(activations, n_plots=len(activations))
-    imdir = options['save_dir'] + "/" + options['run_ID']
+    imdir = options.save_dir + "/" + options.run_ID
     imsave(imdir + "/" + str(step) + ".png", rm_fig)
 
 

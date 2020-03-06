@@ -17,8 +17,6 @@ class TrajectoryGenerator(object):
         x = position[:,0]
         y = position[:,1]
         dists = [box_width/2-x, box_height/2-y, box_width/2+x, box_height/2+y]
-        # if self.options['extended_box']:
-        #     dists[0] = 5*box_width-x
         d_wall = np.min(dists, axis=0)
         angles = np.arange(4)*np.pi/2
         theta = angles[np.argmin(dists, axis=0)]
@@ -35,7 +33,7 @@ class TrajectoryGenerator(object):
 
     def generate_trajectory(self, box_width, box_height, batch_size):
         '''Generate a random walk in a rectangular box'''
-        samples = self.options['sequence_length']
+        samples = self.options.sequence_length
         dt = 0.02  # time step increment (seconds)
         sigma = 5.76 * 2  # stdev rotation velocity (rads/sec)
         b = 0.13 * 2 * np.pi # forward velocity rayleigh dist scale (m/sec)
@@ -64,7 +62,7 @@ class TrajectoryGenerator(object):
             v = random_vel[:,t]
             turn_angle = np.zeros(batch_size)
 
-            if not self.options['periodic']:
+            if not self.options.periodic:
                 # If in border region, turn and slow down
                 is_near_wall, turn_angle = self.avoid_wall(position[:,t], head_dir[:,t], box_width, box_height)
                 v[is_near_wall] *= 0.25
@@ -81,7 +79,7 @@ class TrajectoryGenerator(object):
             head_dir[:,t+1] = head_dir[:,t] + turn_angle
 
         # Periodic boundaries
-        if self.options['periodic']:
+        if self.options.periodic:
             position[:,:,0] = np.mod(position[:,:,0] + box_width/2, box_width) - box_width/2
             position[:,:,1] = np.mod(position[:,:,1] + box_height/2, box_height) - box_height/2
 
@@ -107,11 +105,11 @@ class TrajectoryGenerator(object):
     
     def get_generator(self, batch_size=None, box_width=None, box_height=None):
         if not batch_size:
-             batch_size = self.options['batch_size']
+             batch_size = self.options.batch_size
         if not box_width:
-            box_width = self.options['box_width']
+            box_width = self.options.box_width
         if not box_height:
-            box_height = self.options['box_height']
+            box_height = self.options.box_height
             
         while True:
             traj = self.generate_trajectory(box_width, box_height, batch_size)
@@ -133,11 +131,11 @@ class TrajectoryGenerator(object):
 
     def get_test_batch(self, batch_size=None, box_width=None, box_height=None):
         if not batch_size:
-             batch_size = self.options['batch_size']
+             batch_size = self.options.batch_size
         if not box_width:
-            box_width = self.options['box_width']
+            box_width = self.options.box_width
         if not box_height:
-            box_height = self.options['box_height']
+            box_height = self.options.box_height
             
         traj = self.generate_trajectory(box_width, box_height, batch_size)
         

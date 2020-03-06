@@ -27,28 +27,3 @@ def get_options():
     options["run_ID"] = run_ID
 
     return options
-
-
-def generate_run_ID(options):
-    ''' 
-    Create a unique run ID from the most relevant
-    parameters. Remaining parameters can be found in 
-    params.npy file. 
-    '''
-    params = [
-        'steps', str(options['sequence_length']),
-        'batch', str(options['batch_size']),
-        options['RNN_type'],
-        str(options['Ng']),
-        options['activation'],
-        'rf', str(options['place_cell_rf']),
-        'DoG', str(options['DoG']),
-        'periodic', str(options['periodic']),
-        'lr', str(options['learning_rate']),
-        'nonneg_reg', str(options['nonneg_reg']),
-        ]
-    separator = '_'
-    run_ID = separator.join(params)
-    run_ID = run_ID.replace('.', '')
-
-    return run_ID
