@@ -46,10 +46,6 @@ def generate_run_ID(options):
         'periodic', str(options['periodic']),
         'lr', str(options['learning_rate']),
         'nonneg_reg', str(options['nonneg_reg']),
-        'test'
-        # 'l2_loss'
-        # 'grid'
-        # 'decoder_RNN_penalty'
         ]
     separator = '_'
     run_ID = separator.join(params)
