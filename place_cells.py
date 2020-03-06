@@ -43,9 +43,9 @@ class PlaceCells(object):
         return outputs
 
     
-    def get_nearest_cell_pos(self, activation):
-        '''Return location of maximally active place cell'''
-        _, idxs = tf.math.top_k(activation, k=3)
+    def get_nearest_cell_pos(self, activation, k=3):
+        '''Decode position using centers of k maximally active place cells'''
+        _, idxs = tf.math.top_k(activation, k=k)
         return tf.reduce_mean(tf.gather(self.us, idxs), axis=-2)
         
 
