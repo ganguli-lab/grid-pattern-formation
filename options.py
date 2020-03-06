@@ -13,7 +13,7 @@ def get_options():
     options["sequence_length"] = 20
     options["learning_rate"] = 1e-4
     options["Np"] = 512              # number of place cells
-    options["Ng"] = 4096              # number of grid cells
+    options["Ng"] = 4096             # number of grid cells
     options["place_cell_rf"] = 0.12  # width of place cell tuning curve
     options["surround_width"] = 2   # width of place cell surround
     options["RNN_type"] = "RNN"
@@ -46,7 +46,7 @@ def generate_run_ID(options):
         'periodic', str(options['periodic']),
         'lr', str(options['learning_rate']),
         'nonneg_reg', str(options['nonneg_reg']),
-        # '2'
+        'test'
         # 'l2_loss'
         # 'grid'
         # 'decoder_RNN_penalty'

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 import tensorflow as tf
 from matplotlib import pyplot as plt
@@ -70,7 +69,7 @@ def plot_ratemaps(activations, n_plots, cmap='jet', smooth=True, width=16):
     return rm_fig
 
 
-def compute_ratemaps(model, data_manager, options, res=20, n_avg=None, Ng=512, idxs=None):
+def compute_ratemaps(model, trajectory_generator, options, res=20, n_avg=None, Ng=512, idxs=None):
     '''Compute spatial firing fields'''
 
     if not n_avg:
@@ -87,7 +86,7 @@ def compute_ratemaps(model, data_manager, options, res=20, n_avg=None, Ng=512, i
     counts  = np.zeros([res, res])
 
     for index in tqdm(range(n_avg), leave=False, desc='Computing ratemaps'):
-        inputs, pos_batch, _ = data_manager.get_test_batch()
+        inputs, pos_batch, _ = trajectory_generator.get_test_batch()
         g_batch = model.g(inputs)
         
         pos_batch = np.reshape(pos_batch, [-1, 2])
@@ -121,16 +120,16 @@ def compute_ratemaps(model, data_manager, options, res=20, n_avg=None, Ng=512, i
     return activations, rate_map, g, pos
 
 
-def save_ratemaps(model, data_manager, options, step, res=20, n_avg=None):
+def save_ratemaps(model, trajectory_generator, options, step, res=20, n_avg=None):
     if not n_avg:
         n_avg = 1000 // options['sequence_length']
-    activations, rate_map, g, pos = compute_ratemaps(model, data_manager, options, res=res, n_avg=n_avg)
+    activations, rate_map, g, pos = compute_ratemaps(model, trajectory_generator, options, res=res, n_avg=n_avg)
     rm_fig = plot_ratemaps(activations, n_plots=len(activations))
     imdir = options['save_dir'] + "/" + options['run_ID']
     imsave(imdir + "/" + str(step) + ".png", rm_fig)
 
 
-def save_autocorr(sess, model, save_name, data_manager, step, flags):
+def save_autocorr(sess, model, save_name, trajectory_generator, step, flags):
     starts = [0.2] * 10
     ends = np.linspace(0.4, 1.0, num=10)
     coord_range=((-1.1, 1.1), (-1.1, 1.1))
@@ -140,7 +139,7 @@ def save_autocorr(sess, model, save_name, data_manager, step, flags):
     res = dict()
     index_size = 100
     for _ in range(index_size):
-      feed_dict = data_manager.feed_dict(flags.box_width, flags.box_height)
+      feed_dict = trajectory_generator.feed_dict(flags.box_width, flags.box_height)
       mb_res = sess.run({
           'pos_xy': model.target_pos,
           'bottleneck': model.g,
