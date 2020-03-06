@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import tensorflow as tf
 import os
 import numpy as np
@@ -34,7 +35,6 @@ class TrajectoryGenerator(object):
 
     def generate_trajectory(self, box_width, box_height, batch_size):
         '''Generate a random walk in a rectangular box'''
-        # Parameters
         samples = self.options['sequence_length']
         dt = 0.02  # time step increment (seconds)
         sigma = 5.76 * 2  # stdev rotation velocity (rads/sec)
