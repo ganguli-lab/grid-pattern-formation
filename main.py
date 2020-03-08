@@ -37,10 +37,10 @@ parser.add_argument('--Ng',
 					help='number of grid cells')
 parser.add_argument('--place_cell_rf',
 					default=0.12,
-					help='width of place cell center tuning curve')
-parser.add_argument('--surround_width',
+					help='width of place cell center tuning curve (cm)')
+parser.add_argument('--surround_scale',
 					default=2,
-					help='width of place cell surround tuning curve')
+					help='if DoG, ratio of sigma2 to sigma1')
 parser.add_argument('--RNN_type',
 					default='RNN',
 					help='RNN or LSTM')
