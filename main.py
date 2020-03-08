@@ -15,7 +15,7 @@ parser.add_argument('--save_dir',
 					default='/mnt/fs2/bsorsch/grid_cells/models/',
 					help='directory to save trained models')
 parser.add_argument('--n_epochs',
-					default=5,
+					default=50,
 					help='number of training epochs')
 parser.add_argument('--n_steps',
 					default=1000,
