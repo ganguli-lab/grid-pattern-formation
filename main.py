@@ -36,8 +36,8 @@ parser.add_argument('--Ng',
 					default=4096,
 					help='number of grid cells')
 parser.add_argument('--place_cell_rf',
-					default=0.12,
-					help='width of place cell center tuning curve (cm)')
+					default=12,
+					help='width of place cell center tuning curve (m)')
 parser.add_argument('--surround_scale',
 					default=2,
 					help='if DoG, ratio of sigma2 to sigma1')

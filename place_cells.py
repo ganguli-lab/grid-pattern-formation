@@ -10,8 +10,6 @@ class PlaceCells(object):
         self.Np = options.Np
         self.sigma = options.place_cell_rf
         self.surround_scale = options.surround_scale
-        self.sigma1 = options.place_cell_rf
-        self.sigma2 = self.sigma * np.sqrt(self.surround_scale)
         self.box_width = options.box_width
         self.box_height = options.box_height
         self.is_periodic = options.periodic
@@ -38,16 +36,7 @@ class PlaceCells(object):
         norm2 = tf.reduce_sum(d**2, axis=-1)
         outputs = tf.nn.softmax(-norm2/(2*self.sigma**2))
 
-        # outputs = tf.math.exp(-norm2/2/self.sigma**2)
-
         if self.DoG:
-            # alpha = 1/2/np.pi/self.sigma1**2
-            # beta = 1/2/np.pi/self.sigma2**2
-            # outputs *= alpha
-            # outputs -= beta*tf.math.exp(-norm2/2/self.sigma2**2)
-            # offset = -np.exp(4*self.sigma1**2*(-np.log(self.sigma1)+np.log(self.sigma2))/(self.sigma1**2-self.sigma2**2)) * (self.sigma1**2-self.sigma2**2) /2/np.pi/self.sigma2**4
-            # outputs += offset
-            # outputs /= offset*self.Np
             outputs -= tf.nn.softmax(-norm2/(2*self.surround_scale*self.sigma**2))
             outputs += tf.abs(tf.reduce_min(outputs, axis=-1, keepdims=True))
             outputs /= tf.reduce_sum(outputs, axis=-1, keepdims=True)
