@@ -2,7 +2,11 @@
 
 ## About
 
-Training an RNN on a path integration task produces grid-like representations
+Training an RNN on a path integration task produces grid-like representations. 
+
+
+* [**inspect_model**]():
+  Train a model and visualize its hidden unit ratemaps.
 
 ## Result
 
