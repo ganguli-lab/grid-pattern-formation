@@ -21,26 +21,59 @@ class RNN(Model):
                              recurrent_initializer='glorot_uniform',
                              name='RNN',
                              use_bias=False)
+        # Linear read-out weights
         self.decoder = Dense(self.Np, name='decoder', use_bias=False)
 
         # Loss function
         self.loss_fun = tf.nn.softmax_cross_entropy_with_logits
     
+
     def g(self, inputs):
-        '''Compute grid cell activations'''
+        '''
+        Compute grid cell activations.
+
+        Args:
+            inputs: Batch of 2d velocity inputs with shape [batch_size, sequence_length, 2].
+
+        Returns: 
+            g: Batch of grid cell activations with shape [batch_size, sequence_length, Ng].
+        '''
         v, p0 = inputs
         init_state = self.encoder(p0)
         g = self.RNN(v, initial_state=init_state)
         return g
     
+
     def call(self, inputs):
-        '''Predict place cell code'''
+        '''
+        Predict place cell code.
+
+        Args:
+            inputs: Batch of 2d velocity inputs with shape [batch_size, sequence_length, 2].
+
+        Returns: 
+            place_preds: Predicted place cell activations with shape 
+                [batch_size, sequence_length, Np].
+        '''
         place_preds = self.decoder(self.g(inputs))
         
         return place_preds
 
+
     def compute_loss(self, inputs, pc_outputs, pos):
-        '''Compute loss and decoding error'''
+        '''
+        Compute avg. loss and decoding error.
+
+        Args:
+            inputs: Batch of 2d velocity inputs with shape [batch_size, sequence_length, 2].
+            pc_outputs: Ground truth place cell activations with shape 
+                [batch_size, sequence_length, Np].
+            pos: Ground truth 2d position with shape [batch_size, sequence_length, 2].
+
+        Returns:
+            loss: Avg. loss for this training batch.
+            err: Avg. decoded position error in cm.
+        '''
         g = self.g(inputs)
         preds = self.decoder(g)
         loss = tf.reduce_mean(self.loss_fun(pc_outputs, preds))

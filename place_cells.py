@@ -15,7 +15,7 @@ class PlaceCells(object):
         self.is_periodic = options.periodic
         self.DoG = options.DoG
         
-        # Randomly tile place cell centers
+        # Randomly tile place cell centers across environment
         tf.random.set_seed(0)
         usx = tf.random.uniform((self.Np,), -self.box_width/2, self.box_width/2, dtype=tf.float64)
         usy = tf.random.uniform((self.Np,), -self.box_height/2, self.box_height/2, dtype=tf.float64)
@@ -23,7 +23,15 @@ class PlaceCells(object):
 
         
     def get_activation(self, pos):
-        '''Get place cell activations for a given position'''
+        '''
+        Get place cell activations for a given position.
+
+        Args:
+            pos: 2d position of shape [batch_size, sequence_length, 2].
+
+        Returns:
+            outputs: Place cell activations with shape [batch_size, sequence_length, Np].
+        '''
         d = tf.abs(pos[:, :, tf.newaxis, :] - self.us[tf.newaxis, tf.newaxis, ...])
 
         if self.is_periodic:
@@ -34,19 +42,37 @@ class PlaceCells(object):
             d = tf.stack([dx,dy], axis=-1)
 
         norm2 = tf.reduce_sum(d**2, axis=-1)
+
+        # Normalize place cell outputs with prefactor alpha=1/2/np.pi/self.sigma**2,
+        # or, simply normalize with softmax, which yields same normalization on 
+        # average and seems to speed up training.
         outputs = tf.nn.softmax(-norm2/(2*self.sigma**2))
 
         if self.DoG:
+            # Again, normalize with prefactor 
+            # beta=1/2/np.pi/self.sigma**2/self.surround_scale, or use softmax.
             outputs -= tf.nn.softmax(-norm2/(2*self.surround_scale*self.sigma**2))
+
+            # Shift and scale outputs so that they lie in [0,1].
             outputs += tf.abs(tf.reduce_min(outputs, axis=-1, keepdims=True))
             outputs /= tf.reduce_sum(outputs, axis=-1, keepdims=True)
         return outputs
 
     
     def get_nearest_cell_pos(self, activation, k=3):
-        '''Decode position using centers of k maximally active place cells'''
+        '''
+        Decode position using centers of k maximally active place cells.
+        
+        Args: 
+            activation: Place cell activations of shape [batch_size, sequence_length, Np].
+            k: Number of maximally active place cells with which to decode position.
+
+        Returns:
+            pred_pos: Predicted 2d position with shape [batch_size, sequence_length, 2].
+        '''
         _, idxs = tf.math.top_k(activation, k=k)
-        return tf.reduce_mean(tf.gather(self.us, idxs), axis=-2)
+        pred_pos = tf.reduce_mean(tf.gather(self.us, idxs), axis=-2)
+        return pred_pos
         
 
     def grid_pc(self, pc_outputs, res=32):
@@ -60,7 +86,7 @@ class PlaceCells(object):
         us_np = self.us.numpy()
         pc_outputs = pc_outputs.numpy().reshape(-1, self.Np)
         
-        T = pc_outputs.shape[0]
+        T = pc_outputs.shape[0] #T vs transpose? What is T? (dim's?)
         pc = np.zeros([T, res, res])
         for i in range(len(pc_outputs)):
             gridval = scipy.interpolate.griddata(us_np, pc_outputs[i], grid)
@@ -75,6 +101,7 @@ class PlaceCells(object):
 
         pos = pos.astype(np.float32)
 
+        #Maybe specify dimensions here again?
         pc_outputs = self.get_activation(pos)
         pc_outputs = tf.reshape(pc_outputs, (-1, self.Np))
 

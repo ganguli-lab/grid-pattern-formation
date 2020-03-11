@@ -23,11 +23,25 @@ class Trainer(object):
         self.ckpt_manager = tf.train.CheckpointManager(self.ckpt, self.ckpt_dir, max_to_keep=500)
         self.ckpt.restore(self.ckpt_manager.latest_checkpoint)
         if self.ckpt_manager.latest_checkpoint:
-            print("Restored from {}".format(self.ckpt_manager.latest_checkpoint))
+            print("Restored trained model from {}".format(self.ckpt_manager.latest_checkpoint))
         else:
-            print("Initializing from scratch.")
+            print("Initializing new model from scratch.")
+
 
     def train_step(self, inputs, pc_outputs, pos):
+        ''' 
+        Train on one batch of trajectories.
+
+        Args:
+            inputs: Batch of 2d velocity inputs with shape [batch_size, sequence_length, 2].
+            pc_outputs: Ground truth place cell activations with shape 
+                [batch_size, sequence_length, Np].
+            pos: Ground truth 2d position with shape [batch_size, sequence_length, 2].
+
+        Returns:
+            loss: Avg. loss for this training batch.
+            err: Avg. decoded position error in cm.
+        '''
         with tf.GradientTape() as tape:
             loss, err = self.model.compute_loss(inputs, pc_outputs, pos)
 
@@ -40,6 +54,15 @@ class Trainer(object):
 
 
     def train(self, n_epochs=10, n_steps=100, save=True):
+        ''' 
+        Train model on simulated trajectories.
+
+        Args:
+            n_epochs: Number of training epochs
+            n_steps: Number of batches of trajectories per epoch
+            save: If true, save a checkpoint after each epoch.
+        '''
+
         # Construct generator
         gen = self.trajectory_generator.get_generator()
 
@@ -49,14 +72,14 @@ class Trainer(object):
             np.save(self.ckpt_dir + '/options.npy', self.options)
 
         for epoch in tqdm(range(n_epochs)):
-            t = tqdm(range(n_steps), leave=True)
+            t = tqdm(range(n_steps), leave=False)
             for _ in t:
                 inputs, pc_outputs, pos = next(gen)
                 loss, err = self.train_step(inputs, pc_outputs, pos)
                 self.loss.append(loss)
                 self.err.append(err)
                 
-                # t.set_description('Acc = ' + str(np.round(100*acc, 1)) + '%')
+                #Log error rate
                 t.set_description('Error = ' + str(np.int(100*err)) + 'cm')
 
                 self.ckpt.step.assign_add(1)
@@ -71,7 +94,7 @@ class Trainer(object):
 
 
     def load_ckpt(self, idx):
-        '''Restore model from earlier checkpoint'''
+        ''' Restore model from earlier checkpoint. '''
         self.ckpt.restore(self.ckpt_manager.checkpoints[idx])
 
             

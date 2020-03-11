@@ -45,16 +45,12 @@ class TrajectoryGenerator(object):
         head_dir = np.zeros([batch_size, samples+2])
         position[:,0,0] = np.random.uniform(-box_width/2, box_width/2, batch_size)
         position[:,0,1] = np.random.uniform(-box_height/2, box_height/2, batch_size)
-        # position[:,0,0] = np.random.uniform(-1.1, 1.1, batch_size)
-        # position[:,0,1] = np.random.uniform(-1.1, 1.1, batch_size)
         head_dir[:,0] = np.random.uniform(0, 2*np.pi, batch_size)
         velocity = np.zeros([batch_size, samples+2])
         
         # Generate sequence of random boosts and turns
         random_turn = np.random.normal(mu, sigma, [batch_size, samples+1])
         random_vel = np.random.rayleigh(b, [batch_size, samples+1])
-        # v = np.random.rayleigh(b, batch_size)
-        # random_vel = np.abs(np.random.normal(0, b*np.pi/2, [batch_size, samples+1]))
         v = np.abs(np.random.normal(0, b*np.pi/2, batch_size))
 
         for t in range(samples+1):
@@ -104,6 +100,9 @@ class TrajectoryGenerator(object):
 
     
     def get_generator(self, batch_size=None, box_width=None, box_height=None):
+        '''
+        Returns a generator that yields batches of trajectories
+        '''
         if not batch_size:
              batch_size = self.options.batch_size
         if not box_width:
@@ -130,6 +129,7 @@ class TrajectoryGenerator(object):
 
 
     def get_test_batch(self, batch_size=None, box_width=None, box_height=None):
+        ''' For testing performance, returns a batch of smample trajectories'''
         if not batch_size:
              batch_size = self.options.batch_size
         if not box_width:

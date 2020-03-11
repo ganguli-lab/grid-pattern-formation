@@ -40,7 +40,7 @@ parser.add_argument('--place_cell_rf',
 					help='width of place cell center tuning curve (m)')
 parser.add_argument('--surround_scale',
 					default=2,
-					help='if DoG, ratio of sigma2 to sigma1')
+					help='if DoG, ratio of sigma2^2 to sigma1^2')
 parser.add_argument('--RNN_type',
 					default='RNN',
 					help='RNN or LSTM')
