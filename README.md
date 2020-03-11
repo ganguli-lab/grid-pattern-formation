@@ -10,4 +10,4 @@ Training an RNN on a path integration task produces grid-like representations.
 
 ## Result
 
-![grid visualization](./docs/RNNgrids.pdf)
+![grid visualization](./docs/RNNgrids.png)
