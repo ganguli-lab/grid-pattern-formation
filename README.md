@@ -6,7 +6,7 @@ Training an RNN on a path integration task produces grid-like representations.
   Train a model and visualize its hidden unit ratemaps.
   
 * [**main.py**]():
-  Or, train a model from the command line.
+  or, train a model from the command line.
 
 ## Result
 
