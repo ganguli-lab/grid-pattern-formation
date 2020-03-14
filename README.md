@@ -26,10 +26,8 @@ Includes:
   
 * [**models/example_trained_weights.npy**](models/example_trained_weights.npy)
   Contains a set of pre-trained weights.
- 
-![](./docs/poisson_spiking.gif)
 
-<img src="./docs/poisson_spiking.gif">
+<img src="./docs/poisson_spiking.gif" width="48">
 
 ```shell
 $ virtualenv env
