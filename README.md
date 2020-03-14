@@ -26,7 +26,8 @@ Other files:
   
 * [**models/example_trained_weights.npy**](models/example_trained_weights.npy)
   Contains a set of pre-trained weights.
-
+  
+Requirements:
 
 ```shell
 $ virtualenv env
