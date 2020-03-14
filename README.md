@@ -2,8 +2,17 @@
 
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
+* [**trajectory_generator.py**](trajectory_generator.py):
+  Generate simulated rat trajectories in a rectangular environment.
+
+* [**place_cells.py**](place_cells.py):
+  Tile a set of simulated place cells across the training environment. 
+  
+* [**model.py**](model.py):
+  Contains the vanilla RNN model architecture, as well as an LSTM.
+
 * [**inspect_model.ipynb**](inspect_model.ipynb):
-  Train a model and visualize its hidden unit ratemaps. A set of pre-trained weights is saved in .
+  Train a model and visualize its hidden unit ratemaps in a Jupyter notebook. 
  
 * [**main.py**](main.py):
   or, train a model from the command line.
