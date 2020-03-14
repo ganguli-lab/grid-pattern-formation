@@ -1,4 +1,4 @@
-# Grid cells in RNNs trained to navigate
+# Grid cells in RNNs trained to path integrate
 
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
