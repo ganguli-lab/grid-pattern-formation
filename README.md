@@ -1,4 +1,4 @@
-# Grid cells in artificial neural networks
+# Grid cells in trained recurrent neural networks
 
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
