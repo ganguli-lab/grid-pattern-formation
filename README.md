@@ -10,7 +10,7 @@ Quick start:
 * [**main.py**](main.py):
   or, train a model from the command line.
   
-Other files:
+Includes:
 
 * [**trajectory_generator.py**](trajectory_generator.py):
   Generate simulated rat trajectories in a rectangular environment.
