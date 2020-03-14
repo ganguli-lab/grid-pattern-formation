@@ -2,13 +2,13 @@
 
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
-<img src="./docs/poisson_spiking.gif" width="300" align="right">
-
 
 Quick start:
 
+<img src="./docs/poisson_spiking.gif" width="300" align="right">
+
 * [**inspect_model.ipynb**](inspect_model.ipynb):
-  Train a model and visualize its hidden unit ratemaps in a Jupyter notebook. 
+  Train a model and visualize its hidden unit ratemaps. 
  
 * [**main.py**](main.py):
   or, train a model from the command line.
