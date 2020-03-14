@@ -29,6 +29,8 @@ Includes:
  
 ![](./docs/poisson_spiking.gif)
 
+<img src="./docs/poisson_spiking.gif">
+
 ```shell
 $ virtualenv env
 $ source env/bin/activate
