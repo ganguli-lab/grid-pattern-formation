@@ -25,7 +25,7 @@ Other files:
   Contains model training loop.
   
 * [**models/example_trained_weights.npy**](models/example_trained_weights.npy)
-  a set of pre-trained weights.
+  Contains a set of pre-trained weights.
 
 
 ```shell
