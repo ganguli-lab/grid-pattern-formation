@@ -1,6 +1,6 @@
 # Grid cells in RNNs trained to navigate
 
-![poission_spiking](./docs/poisson_spiking.gif)
+<img align="right" src="./docs/poission_spiking.gif">
 
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
