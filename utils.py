@@ -120,3 +120,15 @@ def compute_variance(res, n_avg):
                 
     return variance
 
+
+def load_trained_weights(model, trainer, weight_dir):
+    ''' Load weights stored as a .npy file (for github)'''
+
+    # Train for a single step to initialize weights
+    trainer.train(n_epochs=1, n_steps=1, save=False)
+
+    # Load weights from npy array
+    weights = np.load(weight_dir, allow_pickle=True)
+    model.set_weights(weights)
+    print('Loaded trained weights.')
+
