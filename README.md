@@ -1,7 +1,5 @@
 # Grid cells in RNNs trained to navigate
 
-<img align="right" src="./docs/poission_spiking.gif">
-
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
 Quick start:
@@ -29,6 +27,7 @@ Includes:
 * [**models/example_trained_weights.npy**](models/example_trained_weights.npy)
   Contains a set of pre-trained weights.
  
+![](./docs/poisson_spiking.gif = 250x250)
 
 ```shell
 $ virtualenv env
