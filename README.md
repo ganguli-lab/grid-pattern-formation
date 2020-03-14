@@ -2,6 +2,8 @@
 
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
+<img src="./docs/poisson_spiking.gif" width="200" align="right">
+
 Quick start:
 
 * [**inspect_model.ipynb**](inspect_model.ipynb):
@@ -26,8 +28,6 @@ Includes:
   
 * [**models/example_trained_weights.npy**](models/example_trained_weights.npy)
   Contains a set of pre-trained weights.
-
-<img src="./docs/poisson_spiking.gif" width="100" justify="right">
 
 ```shell
 $ virtualenv env
