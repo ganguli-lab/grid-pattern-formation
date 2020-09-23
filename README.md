@@ -13,6 +13,10 @@ Quick start:
 * [**main.py**](main.py):
   or, train a model from the command line.
   
+* [**pattern formation.ipynb**](main.py):
+  Numerical simulations of pattern-forming dynamics.
+  
+  
 Includes:
 
 * [**trajectory_generator.py**](trajectory_generator.py):
