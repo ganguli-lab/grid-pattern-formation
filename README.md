@@ -1,6 +1,6 @@
 # Grid cells in RNNs trained to path integrate
 
-Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
+Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation (NeurIPS '19)**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation). 
 
 
 Quick start:
@@ -12,6 +12,10 @@ Quick start:
  
 * [**main.py**](main.py):
   or, train a model from the command line.
+  
+* [**pattern_formation.ipynb**](pattern%20formation.ipynb):
+  Numerical simulations of pattern-forming dynamics.
+  
   
 Includes:
 
