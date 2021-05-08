@@ -24,6 +24,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal
+import scipy.ndimage as ndimage
 
 
 def circle_mask(size, radius, in_val=1.0, out_val=0.0):
@@ -221,3 +222,51 @@ class GridScorer(object):
     ax.axis('off')
     if title is not None:
       ax.set_title(title)
+
+
+def border_score(rm, res, box_width):
+	# Find connected firing fields
+    pix_area = 100**2*box_width**2/res**2
+    rm_thresh =  rm>(rm.max()*0.3)
+    rm_comps, ncomps = ndimage.measurements.label(rm_thresh)
+
+    # Keep fields with area > 200cm^2
+    masks = []
+    nfields = 0
+    for i in range(1,ncomps+1):
+        mask = (rm_comps==i).reshape(res,res)
+        if mask.sum()*pix_area > 200:
+            masks.append(mask)
+            nfields += 1
+            
+    # Max coverage of any one field over any one border
+    cm_max = 0
+    for mask in masks:
+        mask = masks[0]
+        n_cov = mask[0].mean()
+        s_cov = mask[-1].mean()
+        e_cov = mask[:,0].mean()
+        w_cov = mask[:,-1].mean()
+        cm = np.max([n_cov,s_cov,e_cov,w_cov])
+        if cm>cm_max:
+            cm_max = cm
+
+    # Distance to nearest wall
+    x,y = np.mgrid[:res,:res] + 1
+    x = x.ravel()
+    y = y.ravel()
+    xmin = np.min(np.vstack([x,res+1-x]),0)
+    ymin = np.min(np.vstack([y,res+1-y]),0)
+    dweight = np.min(np.vstack([xmin,ymin]),0).reshape(res,res)
+    dweight = dweight*box_width/res
+
+    # Mean firing distance
+    dms = []
+    for mask in masks:
+        field = rm[mask]
+        field /= field.sum()   # normalize
+        dm = (field*dweight[mask]).sum()
+        dms.append(dm)
+    dm = np.nanmean(dms) / (box_width/2)
+    border_score = (cm_max-dm)/(cm_max+dm)
+    return border_score, cm_max, dm

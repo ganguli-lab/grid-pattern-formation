@@ -5,6 +5,7 @@ __pycache__/
 
 images/
 movies/
+data/
 fixed_point_finder_data/
 ben_decimate_1000_step/
 ben_true_100_step/
