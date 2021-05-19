@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import tensorflow as tf
+import torch
 import os
 import numpy as np
+
 
 
 class TrajectoryGenerator(object):
@@ -113,16 +114,19 @@ class TrajectoryGenerator(object):
         while True:
             traj = self.generate_trajectory(box_width, box_height, batch_size)
             
-            v = tf.stack([traj['ego_v']*tf.cos(traj['target_hd']), 
-                  traj['ego_v']*tf.sin(traj['target_hd'])], axis=-1)
+            v = np.stack([traj['ego_v']*np.cos(traj['target_hd']), 
+                  traj['ego_v']*np.sin(traj['target_hd'])],axis=-1)
+            v = torch.tensor(v,dtype=torch.float32).swapaxes(0,1)
 
-            pos = tf.stack([traj['target_x'], traj['target_y']], axis=-1)
+            pos = np.stack([traj['target_x'], traj['target_y']],axis=-1)
+            pos = torch.tensor(pos,dtype=torch.float32).swapaxes(0,1).cuda()
             place_outputs = self.place_cells.get_activation(pos)
 
-            init_pos = tf.stack([traj['init_x'], traj['init_y']], axis=-1)
-            init_actv = tf.squeeze(self.place_cells.get_activation(init_pos))
+            init_pos = np.stack([traj['init_x'], traj['init_y']],axis=-1)
+            init_pos = torch.tensor(init_pos,dtype=torch.float32).cuda()
+            init_actv = self.place_cells.get_activation(init_pos).squeeze()
 
-            inputs = (v, init_actv)
+            inputs = (v.cuda(), init_actv)
         
             yield (inputs, place_outputs, pos)
 
@@ -139,15 +143,18 @@ class TrajectoryGenerator(object):
             
         traj = self.generate_trajectory(box_width, box_height, batch_size)
         
-        v = tf.stack([traj['ego_v']*tf.cos(traj['target_hd']), 
-              traj['ego_v']*tf.sin(traj['target_hd'])], axis=-1)
+        v = np.stack([traj['ego_v']*np.cos(traj['target_hd']), 
+              traj['ego_v']*np.sin(traj['target_hd'])],axis=-1)
+        v = torch.tensor(v,dtype=torch.float32).swapaxes(0,1)
 
-        pos = tf.stack([traj['target_x'], traj['target_y']], axis=-1)
+        pos = np.stack([traj['target_x'], traj['target_y']],axis=-1)
+        pos = torch.tensor(pos,dtype=torch.float32).swapaxes(0,1).cuda()
         place_outputs = self.place_cells.get_activation(pos)
 
-        init_pos = tf.stack([traj['init_x'], traj['init_y']], axis=-1)
-        init_actv = tf.squeeze(self.place_cells.get_activation(init_pos))
+        init_pos = np.stack([traj['init_x'], traj['init_y']],axis=-1)
+        init_pos = torch.tensor(init_pos,dtype=torch.float32).cuda()
+        init_actv = self.place_cells.get_activation(init_pos).squeeze()
 
-        inputs = (v, init_actv)
+        inputs = (v.cuda(), init_actv)
         
         return (inputs, pos, place_outputs)

@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 
 
 def generate_run_ID(options):

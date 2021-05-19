@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import tensorflow as tf
+import torch
 import numpy as np
 
 from visualize import save_ratemaps
-from tqdm import tqdm
+import os
 
 
 class Trainer(object):
@@ -12,18 +12,17 @@ class Trainer(object):
         self.model = model
         self.trajectory_generator = trajectory_generator
         lr = self.options.learning_rate
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
         self.loss = []
         self.err = []
 
         # Set up checkpoints
-        self.ckpt = tf.train.Checkpoint(step=tf.Variable(0), optimizer=self.optimizer, net=model)
-        self.ckpt_dir = options.save_dir + '/' + options.run_ID + '/ckpts'
-        self.ckpt_manager = tf.train.CheckpointManager(self.ckpt, self.ckpt_dir, max_to_keep=500)
-        self.ckpt.restore(self.ckpt_manager.latest_checkpoint)
-        if self.ckpt_manager.latest_checkpoint:
-            print("Restored trained model from {}".format(self.ckpt_manager.latest_checkpoint))
+        self.ckpt_dir = os.path.join(options.save_dir, options.run_ID)
+        if os.path.isdir(self.ckpt_dir):
+            ckpt = os.path.join(self.ckpt_dir, 'most_recent_model.pth')
+            self.model.load_state_dict(torch.load(ckpt))
+            print("Restored trained model from {}".format(ckpt))
         else:
             print("Initializing new model from scratch.")
 
@@ -42,59 +41,48 @@ class Trainer(object):
             loss: Avg. loss for this training batch.
             err: Avg. decoded position error in cm.
         '''
-        with tf.GradientTape() as tape:
-            loss, err = self.model.compute_loss(inputs, pc_outputs, pos)
+        self.model.zero_grad()
 
-        grads = tape.gradient(loss, self.model.trainable_variables)
-
-        self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
-
+        loss, err = self.model.compute_loss(inputs, pc_outputs, pos)
         
-        return loss, err
+        loss.backward()
+        self.optimizer.step()
+        
+        return loss.item(), err.item()
 
 
-    def train(self, n_epochs=10, n_steps=100, save=True):
+    def train(self, n_steps=10, save=True):
         ''' 
         Train model on simulated trajectories.
 
         Args:
-            n_epochs: Number of training epochs
-            n_steps: Number of batches of trajectories per epoch
+            n_steps: Number of training steps
             save: If true, save a checkpoint after each epoch.
         '''
 
         # Construct generator
         gen = self.trajectory_generator.get_generator()
 
-        # Save at beginning of training
-        if save:
-            self.ckpt_manager.save()
-            np.save(self.ckpt_dir + '/options.npy', self.options)
+        # tbar = tqdm(range(n_steps), leave=False)
+        for t in range(n_steps):
+            inputs, pc_outputs, pos = next(gen)
+            loss, err = self.train_step(inputs, pc_outputs, pos)
+            self.loss.append(loss)
+            self.err.append(err)
 
-        for epoch in tqdm(range(n_epochs)):
-            t = tqdm(range(n_steps), leave=False)
-            for _ in t:
-                inputs, pc_outputs, pos = next(gen)
-                loss, err = self.train_step(inputs, pc_outputs, pos)
-                self.loss.append(loss)
-                self.err.append(err)
-                
-                #Log error rate
-                t.set_description('Error = ' + str(np.int(100*err)) + 'cm')
+            #Log error rate to progress bar
+            # tbar.set_description('Error = ' + str(np.int(100*err)) + 'cm')
 
-                self.ckpt.step.assign_add(1)
-
-            if save:
+            if save and t%1000==0:
+                print('Step {}/{}. Loss: {}. Err: {}cm'.format(
+                    t,n_steps,np.round(loss,2),np.round(err,2)))
                 # Save checkpoint
-                self.ckpt_manager.save()
-                tot_step = self.ckpt.step.numpy()
+                ckpt_path = os.path.join(self.ckpt_dir, 'iter_{}.pth'.format(t))
+                torch.save(self.model.state_dict(), ckpt_path)
+                torch.save(self.model.state_dict(), os.path.join(self.ckpt_dir,
+                                            'most_recent_model.pth'))
 
                 # Save a picture of rate maps
-                save_ratemaps(self.model, self.trajectory_generator, self.options, step=tot_step)
-
-
-    def load_ckpt(self, idx):
-        ''' Restore model from earlier checkpoint. '''
-        self.ckpt.restore(self.ckpt_manager.checkpoints[idx])
-
+                save_ratemaps(self.model, self.trajectory_generator,
+                 self.options, step=t)
             

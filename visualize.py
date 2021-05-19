@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import tensorflow as tf
 from matplotlib import pyplot as plt
 
 import scipy
 import scipy.stats
 from imageio import imsave
 import cv2
-
-from tqdm.autonotebook import tqdm
 
 
 def concat_images(images, image_width, spacer_size):
@@ -86,12 +83,12 @@ def compute_ratemaps(model, trajectory_generator, options, res=20, n_avg=None, N
     activations = np.zeros([Ng, res, res]) 
     counts  = np.zeros([res, res])
 
-    for index in tqdm(range(n_avg), leave=False, desc='Computing ratemaps'):
+    for index in range(n_avg):
         inputs, pos_batch, _ = trajectory_generator.get_test_batch()
-        g_batch = model.g(inputs)
+        g_batch = model.g(inputs).detach().cpu().numpy()
         
-        pos_batch = np.reshape(pos_batch, [-1, 2])
-        g_batch = np.reshape(tf.gather(g_batch, idxs, axis=-1), (-1, Ng))
+        pos_batch = np.reshape(pos_batch.cpu(), [-1, 2])
+        g_batch = g_batch[:,:,idxs].reshape(-1, Ng)
         
         g[index] = g_batch
         pos[index] = pos_batch
@@ -124,7 +121,8 @@ def compute_ratemaps(model, trajectory_generator, options, res=20, n_avg=None, N
 def save_ratemaps(model, trajectory_generator, options, step, res=20, n_avg=None):
     if not n_avg:
         n_avg = 1000 // options.sequence_length
-    activations, rate_map, g, pos = compute_ratemaps(model, trajectory_generator, options, res=res, n_avg=n_avg)
+    activations, rate_map, g, pos = compute_ratemaps(model, trajectory_generator,
+                                                     options, res=res, n_avg=n_avg)
     rm_fig = plot_ratemaps(activations, n_plots=len(activations))
     imdir = options.save_dir + "/" + options.run_ID
     imsave(imdir + "/" + str(step) + ".png", rm_fig)
