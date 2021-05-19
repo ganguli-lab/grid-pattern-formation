@@ -24,6 +24,7 @@ class Trainer(object):
             self.model.load_state_dict(torch.load(ckpt))
             print("Restored trained model from {}".format(ckpt))
         else:
+            os.mkdir(self.ckpt_dir)
             print("Initializing new model from scratch.")
 
 
@@ -75,7 +76,7 @@ class Trainer(object):
 
             if save and t%1000==0:
                 print('Step {}/{}. Loss: {}. Err: {}cm'.format(
-                    t,n_steps,np.round(loss,2),np.round(err,2)))
+                    t,n_steps,np.round(loss,2),np.round(100*err,2)))
                 # Save checkpoint
                 ckpt_path = os.path.join(self.ckpt_dir, 'iter_{}.pth'.format(t))
                 torch.save(self.model.state_dict(), ckpt_path)
