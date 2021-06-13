@@ -7,7 +7,7 @@ import os
 
 
 class Trainer(object):
-    def __init__(self, options, model, trajectory_generator):
+    def __init__(self, options, model, trajectory_generator, restore=True):
         self.options = options
         self.model = model
         self.trajectory_generator = trajectory_generator
@@ -19,13 +19,15 @@ class Trainer(object):
 
         # Set up checkpoints
         self.ckpt_dir = os.path.join(options.save_dir, options.run_ID)
-        if os.path.isdir(self.ckpt_dir):
+        if restore and os.path.isdir(self.ckpt_dir):
             ckpt = os.path.join(self.ckpt_dir, 'most_recent_model.pth')
             self.model.load_state_dict(torch.load(ckpt))
             print("Restored trained model from {}".format(ckpt))
         else:
-            os.mkdir(self.ckpt_dir)
+            if not os.path.isdir(self.ckpt_dir):
+                os.mkdir(self.ckpt_dir)
             print("Initializing new model from scratch.")
+            print("Saving to: {}".format(self.ckpt_dir))
 
 
     def train_step(self, inputs, pc_outputs, pos):
@@ -74,7 +76,7 @@ class Trainer(object):
             #Log error rate to progress bar
             # tbar.set_description('Error = ' + str(np.int(100*err)) + 'cm')
 
-            if save and t%1000==0:
+            if save and t%10000==0:
                 print('Step {}/{}. Loss: {}. Err: {}cm'.format(
                     t,n_steps,np.round(loss,2),np.round(100*err,2)))
                 # Save checkpoint

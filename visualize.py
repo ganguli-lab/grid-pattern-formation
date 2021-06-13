@@ -99,7 +99,7 @@ def compute_ratemaps(model, trajectory_generator, options, res=20, n_avg=None, N
         for i in range(options.batch_size*options.sequence_length):
             x = x_batch[i]
             y = y_batch[i]
-            if x >=0 and x <= res and y >=0 and y <= res:
+            if x >=0 and x < res and y >=0 and y < res:
                 counts[int(x), int(y)] += 1
                 activations[:, int(x), int(y)] += g_batch[i, :]
 
