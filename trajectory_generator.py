@@ -116,10 +116,10 @@ class TrajectoryGenerator(object):
             
             v = np.stack([traj['ego_v']*np.cos(traj['target_hd']), 
                   traj['ego_v']*np.sin(traj['target_hd'])],axis=-1)
-            v = torch.tensor(v,dtype=torch.float32).swapaxes(0,1)
+            v = torch.tensor(v,dtype=torch.float32).transpose(0,1)
 
             pos = np.stack([traj['target_x'], traj['target_y']],axis=-1)
-            pos = torch.tensor(pos,dtype=torch.float32).swapaxes(0,1).cuda()
+            pos = torch.tensor(pos,dtype=torch.float32).transpose(0,1).cuda()
             place_outputs = self.place_cells.get_activation(pos)
 
             init_pos = np.stack([traj['init_x'], traj['init_y']],axis=-1)
