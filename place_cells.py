@@ -5,6 +5,7 @@ import scipy
 
 
 class PlaceCells(object):
+
     def __init__(self, options, us=None):
         self.Np = options.Np
         self.sigma = options.place_cell_rf
@@ -13,17 +14,18 @@ class PlaceCells(object):
         self.box_height = options.box_height
         self.is_periodic = options.periodic
         self.DoG = options.DoG
+        self.device = options.device
         self.softmax = torch.nn.Softmax(dim=-1)
         
         # Randomly tile place cell centers across environment
         np.random.seed(0)
         usx = np.random.uniform(-self.box_width/2, self.box_width/2, (self.Np,))
         usy = np.random.uniform(-self.box_width/2, self.box_width/2, (self.Np,))
-        self.us = torch.tensor(np.vstack([usx, usy]).T).cuda()
+        self.us = torch.tensor(np.vstack([usx, usy]).T)
+        # If using a GPU, put on GPU
+        self.us = self.us.to(self.device)
         # self.us = torch.tensor(np.load('models/example_pc_centers.npy')).cuda()
 
-
-        
     def get_activation(self, pos):
         '''
         Get place cell activations for a given position.
@@ -61,7 +63,6 @@ class PlaceCells(object):
             outputs /= outputs.sum(-1, keepdims=True)
         return outputs
 
-    
     def get_nearest_cell_pos(self, activation, k=3):
         '''
         Decode position using centers of k maximally active place cells.
@@ -76,7 +77,6 @@ class PlaceCells(object):
         _, idxs = torch.topk(activation, k=k)
         pred_pos = self.us[idxs].mean(-2)
         return pred_pos
-        
 
     def grid_pc(self, pc_outputs, res=32):
         ''' Interpolate place cell outputs onto a grid'''
@@ -100,7 +100,11 @@ class PlaceCells(object):
         '''Compute spatial covariance matrix of place cell outputs'''
         pos = np.array(np.meshgrid(np.linspace(-self.box_width/2, self.box_width/2, res),
                          np.linspace(-self.box_height/2, self.box_height/2, res))).T
-        pos = torch.tensor(pos).cuda()
+
+        pos = torch.tensor(pos)
+
+        # Put on GPU if available
+        pos = pos.to(self.device)
 
         #Maybe specify dimensions here again?
         pc_outputs = self.get_activation(pos).reshape(-1,self.Np).cpu()

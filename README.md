@@ -34,9 +34,20 @@ Includes:
 * [**models/example_trained_weights.npy**](models/example_trained_weights.npy)
   Contains a set of pre-trained weights.
 
+## Running
+
+We recommend creating a virtual environment:
+
 ```shell
 $ virtualenv env
 $ source env/bin/activate
+$ pip install --upgrade pip
+```
+
+Then, install the dependencies automatically with `pip install -r requirements.txt`
+or manually with:
+
+```shell
 $ pip install --upgrade numpy==1.17.2
 $ pip install --upgrade tensorflow==2.0.0rc2
 $ pip install --upgrade scipy==1.4.1
@@ -45,6 +56,9 @@ $ pip install --upgrade imageio==2.5.0
 $ pip install --upgrade opencv-python==4.1.1.26
 $ pip install --upgrade tqdm==4.36.0
 ```
+
+If you want to train your own models, make sure to change the default
+save directory in `main.py`! 
 
 ## Result
 
