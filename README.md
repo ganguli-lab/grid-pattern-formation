@@ -59,7 +59,7 @@ $ pip install --upgrade opencv-python==4.1.1.26
 $ pip install --upgrade torch==1.10.0
 ```
 
-If you want to train your own models, make sure to change the default
+If you want to train your own models, make sure to properly set the default
 save directory in `main.py`! 
 
 ## Result
