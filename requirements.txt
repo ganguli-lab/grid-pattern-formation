@@ -5,5 +5,4 @@ matplotlib==3.0.3
 imageio==2.5.0
 opencv-python==4.1.1.26
 tqdm==4.36.0
-opencv-python==4.1.1.26
 torch==1.10.0

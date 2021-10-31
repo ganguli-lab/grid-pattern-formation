@@ -55,6 +55,8 @@ $ pip install --upgrade matplotlib==3.0.3
 $ pip install --upgrade imageio==2.5.0
 $ pip install --upgrade opencv-python==4.1.1.26
 $ pip install --upgrade tqdm==4.36.0
+$ pip install --upgrade opencv-python==4.1.1.26
+$ pip install --upgrade torch==1.10.0
 ```
 
 If you want to train your own models, make sure to change the default
