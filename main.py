@@ -14,7 +14,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--save_dir',
-                    default='/mnt/fs2/bsorsch/grid_cells/models/',
+                    # default='/mnt/fs2/bsorsch/grid_cells/models/',
+                    default='models/',
                     help='directory to save trained models')
 parser.add_argument('--n_epochs',
                     default=100,
