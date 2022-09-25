@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/217773694.svg)](https://zenodo.org/badge/latestdoi/217773694)
+
 # Grid cells in RNNs trained to path integrate
 
 Code to reproduce the trained RNN in [**a unified theory for the origin of grid cells through the lens of pattern formation (NeurIPS '19)**](https://papers.nips.cc/paper/9191-a-unified-theory-for-the-origin-of-grid-cells-through-the-lens-of-pattern-formation) and additional analysis described in this [**preprint**](https://www.biorxiv.org/content/10.1101/2020.12.29.424583v1). 
